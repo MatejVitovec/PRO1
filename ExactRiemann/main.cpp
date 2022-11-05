@@ -1,7 +1,8 @@
 #include <iostream>
-#include <string>
 #include <fstream>
+#include <string>
 #include <cmath>
+#include <vector>
 
 struct State
 {
@@ -47,10 +48,10 @@ PressureFunctionMembers pressureFunction(State stateK, double p)
     {
         // Shock wave
         double ak = (2.0/(GAMMA + 1.0))/stateK.d;
-        double bk = ((GAMMA - 1.0)/(GAMMA+1.0))*stateK.p;
+        double bk = ((GAMMA - 1.0)/(GAMMA + 1.0))*stateK.p;
         double qrt = sqrt(ak/(bk + p));
         out.f = (p - stateK.p)*qrt;
-        out.fd = (1 - (0.5*(p - stateK.p))/(bk + p))*qrt;
+        out.fd = (1.0 - (0.5*(p - stateK.p))/(bk + p))*qrt;
     }
 
     return out;
@@ -86,7 +87,7 @@ State starPressureVelocity(State stateL, State stateR)
         {
             break;
         }
-        if (p <= 0)
+        if (p <= 0.0)
         {
             p = pTolerance;
         }
@@ -101,6 +102,7 @@ State starPressureVelocity(State stateL, State stateR)
 
     return out;
 }
+
 
 State solution(double S, State stateStar, State stateL, State stateR)
 {
@@ -137,7 +139,7 @@ State solution(double S, State stateStar, State stateL, State stateR)
 
             if(S <= SHL)
             {
-                //W = WL
+                // W = WL
                 out = stateL;
             }
             else
@@ -223,33 +225,102 @@ State solution(double S, State stateStar, State stateL, State stateR)
 }
 
 
+void loadData(double& domlen, double& diaph, double& cells, double& lGamma, double& time, State& stateL, State& stateR)
+{
+    std::ifstream file("data.txt");
+    std::string line;
+
+    std::getline(file, line);
+    domlen = std::stod(line);
+    std::getline(file, line);
+    diaph = std::stod(line);
+    std::getline(file, line);
+    cells = std::stod(line);
+    std::getline(file, line);
+    lGamma = std::stod(line);
+    std::getline(file, line);
+    time = std::stod(line);
+
+    std::getline(file, line);
+    stateL.d = std::stod(line);
+    std::getline(file, line);
+    stateL.u = std::stod(line);
+    std::getline(file, line);
+    stateL.p = std::stod(line);
+
+    std::getline(file, line);
+    stateR.d = std::stod(line);
+    std::getline(file, line);
+    stateR.u = std::stod(line);
+    std::getline(file, line);
+    stateR.p = std::stod(line);
+
+    file.close();
+}
+
+
+void saveData(std::vector<std::vector<double>> data, double time, double dx)
+{
+    std::ofstream writeToFile("results.txt");
+    writeToFile << time << std::endl;
+    writeToFile << dx << std::endl;
+
+    for (int j = 0; j < data.size(); j++)
+    {
+        for (int i = 0; i < data[j].size(); i++)
+        {
+            if(i == data[j].size() - 1)
+            {
+                writeToFile << data[j][i];
+            }
+            else
+            {
+                writeToFile << data[j][i] << ", ";
+            }
+        }
+        writeToFile << std::endl;
+    }
+    
+    writeToFile.close();
+}
+
+
 int main()
 {
     double domainLenght;
-    double initialDiscontinuityPosition;
+    double initDiscontinuityPos;
+    double cells;
     double time;
-
     double pressureStar;
     double velocityStar;
-
     State stateL;
     State stateR;
 
-    GAMMA = 1.4;
-    domainLenght = 1.0;
-    initialDiscontinuityPosition = 0.5;
-    time = 0.25;
+    std::vector<std::vector<double>> results;
 
-    stateL.d = 1.0;
-    stateL.u = 0.0;
-    stateL.p = 1000.0;    
-    stateR.d = 1.0;
-    stateR.u = 0.0;
-    stateR.p = 0.01;
-    
+    loadData(domainLenght, initDiscontinuityPos, cells, GAMMA, time, stateL, stateR);
+
+    // Solution for p and u in star region
     State starRegionPU = starPressureVelocity(stateL, stateR);
 
+    double dx = domainLenght/cells;
+    double startX = domainLenght - initDiscontinuityPos;
 
+    for (int i = 0; i <= cells; i++)
+    {
+        double xPos = ((double)i)*dx;
+        double S = (xPos - initDiscontinuityPos)/time;
+
+        // Solution (x,t)
+        State result = solution(S, starRegionPU, stateL, stateR);
+
+        // Internal energy
+        double e = result.p/((GAMMA - 1.0)*result.d);
+
+        results.push_back(std::vector<double> {result.d, result.u, result.p, e});
+    }
+    
+    saveData(results, time, dx);
 
     return 0;
 }
