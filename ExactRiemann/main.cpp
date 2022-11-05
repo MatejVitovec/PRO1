@@ -173,7 +173,7 @@ State solution(double S, State stateStar, State stateL, State stateR)
         if(stateStar.p > stateR.p)
         {
             // Right shock
-            double SR = stateR.u - cR*sqrt(((GAMMA + 1.0)/(2.0*GAMMA))*(stateStar.p/stateR.p) + (GAMMA - 1.0)/(2.0*GAMMA));
+            double SR = stateR.u + cR*sqrt(((GAMMA + 1.0)/(2.0*GAMMA))*(stateStar.p/stateR.p) + (GAMMA - 1.0)/(2.0*GAMMA));
 
             if(S > SR)
             {
@@ -225,9 +225,9 @@ State solution(double S, State stateStar, State stateL, State stateR)
 }
 
 
-void loadData(double& domlen, double& diaph, double& cells, double& lGamma, double& time, State& stateL, State& stateR)
+void loadData(std::string fileName, double& domlen, double& diaph, double& cells, double& lGamma, double& time, State& stateL, State& stateR)
 {
-    std::ifstream file("data.txt");
+    std::ifstream file(fileName);
     std::string line;
 
     std::getline(file, line);
@@ -259,11 +259,13 @@ void loadData(double& domlen, double& diaph, double& cells, double& lGamma, doub
 }
 
 
-void saveData(std::vector<std::vector<double>> data, double time, double dx)
+void saveData(std::string fileName, std::vector<std::vector<double>> data, double domLen, double cells, double time)
 {
-    std::ofstream writeToFile("results.txt");
+    std::ofstream writeToFile(fileName);
+    writeToFile << domLen << std::endl;
+    writeToFile << cells << std::endl;
     writeToFile << time << std::endl;
-    writeToFile << dx << std::endl;
+    
 
     for (int j = 0; j < data.size(); j++)
     {
@@ -275,7 +277,7 @@ void saveData(std::vector<std::vector<double>> data, double time, double dx)
             }
             else
             {
-                writeToFile << data[j][i] << ", ";
+                writeToFile << data[j][i] << ",";
             }
         }
         writeToFile << std::endl;
@@ -285,8 +287,17 @@ void saveData(std::vector<std::vector<double>> data, double time, double dx)
 }
 
 
-int main()
+int main(int argc, char** argv)
 {
+    std::string inputFileName = "data.txt";
+    std::string outputFileName = "results/result.txt";
+
+    if(argc == 3)
+    {
+        inputFileName = argv[1];
+        outputFileName = argv[2];
+    }
+
     double domainLenght;
     double initDiscontinuityPos;
     double cells;
@@ -298,7 +309,7 @@ int main()
 
     std::vector<std::vector<double>> results;
 
-    loadData(domainLenght, initDiscontinuityPos, cells, GAMMA, time, stateL, stateR);
+    loadData(inputFileName, domainLenght, initDiscontinuityPos, cells, GAMMA, time, stateL, stateR);
 
     // Solution for p and u in star region
     State starRegionPU = starPressureVelocity(stateL, stateR);
@@ -320,8 +331,7 @@ int main()
         results.push_back(std::vector<double> {result.d, result.u, result.p, e});
     }
     
-    saveData(results, time, dx);
+    saveData(outputFileName, results, domainLenght, cells, time);
 
     return 0;
 }
-
