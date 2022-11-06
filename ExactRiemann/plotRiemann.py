@@ -1,14 +1,14 @@
 import sys
 from matplotlib import pyplot as plt
 
-imputFileName = "ExactRiemann/results/result.txt"
+inputFileName = "ExactRiemann/results/result.txt"
 outputFileName = "ExactRiemann/results/result.png"
 
 if len(sys.argv) == 3:
-    imputFileName = sys.argv[1]
+    inputFileName = sys.argv[1]
     outputFileName = sys.argv[2]
 
-f = open(imputFileName, "r")
+f = open(inputFileName, "r")
 
 domLen = float(f.readline())
 cells = int(f.readline())

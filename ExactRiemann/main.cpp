@@ -26,7 +26,7 @@ double soundSpeed(State state)
 }
 
 
-double startPressureGuess(State stateL, State stateR)
+double pressureGuess(State stateL, State stateR)
 {
     return 0.5*(stateL.p + stateR.p);
 }
@@ -69,8 +69,7 @@ State starPressureVelocity(State stateL, State stateR)
 
     double pTolerance = 1.0e-6;
 
-    double startPressure = startPressureGuess(stateL, stateR);    
-    double pOld = startPressure;    
+    double pOld = pressureGuess(stateL, stateR);  
     double uDiff = stateR.u - stateL.u;
 
     int nIter = 0;
@@ -96,6 +95,8 @@ State starPressureVelocity(State stateL, State stateR)
     }
 
     u = 0.5*(stateL.u + stateR.u + prefunR.f - prefunL.f);
+
+    //std::cout << "Solition in star region for p* was found by " << nIter << " iteration" << std::endl;
 
     out.p = p;
     out.u = u;
@@ -315,7 +316,6 @@ int main(int argc, char** argv)
     State starRegionPU = starPressureVelocity(stateL, stateR);
 
     double dx = domainLenght/cells;
-    double startX = domainLenght - initDiscontinuityPos;
 
     for (int i = 0; i <= cells; i++)
     {
