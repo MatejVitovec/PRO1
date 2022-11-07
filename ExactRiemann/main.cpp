@@ -38,7 +38,7 @@ PressureFunctionMembers pressureFunction(State stateK, double p)
 
     if(p <= stateK.p)
     {
-        //Rarefaction wave
+        // Rarefaction wave
         double prat = p/stateK.p;
         double ck = soundSpeed(stateK);
         out.f = (2.0/(GAMMA - 1.0))*ck*(pow(prat, (GAMMA - 1.0)/(2*GAMMA)) - 1.0);
