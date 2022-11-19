@@ -33,6 +33,12 @@ inline double pressure(const Vector3& w)
 }
 
 
+inline double internalEnergy(const Vector3& w)
+{
+    return pressure(w)/((GAMMA - 1.0)*density(w));
+}
+
+
 inline double soundSpeed(const Vector3& w)
 {
     return sqrt((GAMMA*pressure(w))/density(w));
@@ -62,9 +68,10 @@ inline Vector3 flux(const Vector3& w)
     return u * w + Vector3({0.0, p, p*u});
 }
 
+
 Vector3 primitiveToConservative(Vector3 v)
 {
-    return Vector3({v[0], v[0]*v[1], (v[2]/((GAMMA - 1.0)*v[0]))*v[0]});
+    return Vector3({v[0], v[0]*v[1], 0.5*v[0]*v[1]*v[1] + (v[2])/(GAMMA - 1)});
 }
 
 
@@ -80,6 +87,7 @@ Vector3 riemannInitialCondition(double x, Vector3 stateL, Vector3 stateR, double
     }
 }
 
+
 double maxTimeStep(const std::vector<Vector3>& w, double dx)
 {
     double dt = 10e+100;
@@ -91,6 +99,7 @@ double maxTimeStep(const std::vector<Vector3>& w, double dx)
 
     return dt;
 }
+
 
 Vector3 HLL(const Vector3& wl, const Vector3& wr)
 {
@@ -114,12 +123,14 @@ Vector3 HLL(const Vector3& wl, const Vector3& wr)
     }
 }
 
+
 Vector3 HLLC(const Vector3& wl, const Vector3& wr)
 {
     //TODO
 
     return Vector3();
 }
+
 
 void loadData(std::string fileName, double& domlen, double& diaph, double& cells, double& lGamma, double& time, Vector3& stateL, Vector3& stateR)
 {
@@ -163,7 +174,7 @@ void saveData(std::string fileName, std::vector<Vector3> w, double domLen, doubl
 
     for (int i = 0; i < w.size(); i++)
     {
-        writeToFile << density(w[i]) << ","<< velocity(w[i]) << "," << pressure(w[i]) << "," << totalEnergy(w[i]) << std::endl;
+        writeToFile << density(w[i]) << ","<< velocity(w[i]) << "," << pressure(w[i]) << "," << internalEnergy(w[i]) << std::endl;
     }
     
     writeToFile.close();
@@ -172,9 +183,8 @@ void saveData(std::string fileName, std::vector<Vector3> w, double domLen, doubl
 
 int main(int argc, char** argv)
 {
-    std::string inputFileName = "data.txt";
-    std::string outputFileName = "results/result.txt";
-
+    std::string inputFileName = "cases/case1.txt";
+    std::string outputFileName = "results/case1result.txt";
 
     if(argc == 3)
     {
@@ -210,12 +220,9 @@ int main(int argc, char** argv)
     bool exitCalcualtion = false;
     int iter = 0;
 
-    //saveData(outputFileName, w, domainLenght, n, setTime);
 
-    //predelat na do while
     while (1)
-    {
-        
+    {        
         f[0] = HLL(w[0], w[0]);
         f[n] = HLL(w[n-1], w[n-1]);
 
@@ -224,7 +231,8 @@ int main(int argc, char** argv)
             f[i] = HLL(w[i-1], w[i]);
         }
 
-        double dt = 0.4 * maxTimeStep(w, dx);        
+        //CFL = 0.9
+        double dt = 0.9 * maxTimeStep(w, dx);        
         if(setTime - time < dt)
         {
             dt = setTime - time;
@@ -252,6 +260,8 @@ int main(int argc, char** argv)
     }
 
     saveData(outputFileName, w, domainLenght, n, setTime);
+
+    std::cout << "Výpočet proběhl úspěšně s " << iter << " iteracemi." << std::endl;
 
     return 0;
 }

@@ -1,6 +1,7 @@
 import sys
 from matplotlib import pyplot as plt
 
+#sys.argv = "", "HLLCRiemann/results/case1exact.txt", "-l", "HLLCRiemann/results/case1result.txt", "-o", "HLLCRiemann/results/case1result.png"
 
 def plotMultipleCurves(x, y, plotType):
     for i in range(len(x)):
@@ -12,8 +13,6 @@ def plotMultipleCurves(x, y, plotType):
         plt.plot(x[i], y[i], plotStyle)
     a = 5
 
-
-#sys.argv = "", "HLLCRiemann/results/exact.txt", "-l", "HLLCRiemann/results/result.txt", "-o", "HLLCRiemann/results/vysledek.png"
 
 inputFileNum = 1
 
@@ -104,5 +103,7 @@ plt.suptitle("t = " + str(time[0]))
 plt.tight_layout()
 
 plt.savefig(outputFileName)
+
+print("Byl vytvořen soubor ", outputFileName)
 
 plt.close()
