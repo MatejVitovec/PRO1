@@ -1,64 +1,105 @@
 import sys
 from matplotlib import pyplot as plt
 
-inputFileName = "results/result.txt"
+
+def plotMultipleCurves(x, y, plotType):
+    for i in range(len(x)):
+        plotStyle = "k."
+
+        if (plotType[i] == "-l"):
+            plotStyle = "k-"
+
+        plt.plot(x[i], y[i], plotStyle)
+    a = 5
+
+
+#sys.argv = "", "HLLCRiemann/results/exact.txt", "-l", "HLLCRiemann/results/result.txt", "-o", "HLLCRiemann/results/vysledek.png"
+
+inputFileNum = 1
+
+if len(sys.argv) > 1:
+    inputFileNum = (int)(len(sys.argv)/2 - 1)
+
+inputFileName = [0] * inputFileNum
+plotType = [0] * inputFileNum
+
+domLen = [0] * inputFileNum
+cells = [0] * inputFileNum
+time = [0] * inputFileNum
+d = [0] * inputFileNum
+u = [0] * inputFileNum
+p = [0] * inputFileNum
+e = [0] * inputFileNum
+x = [0] * inputFileNum
+
+inputFileName[0] = "results/result.txt"
 outputFileName = "results/result.png"
+plotType[0] = "-l"
 
-if len(sys.argv) == 3:
-    inputFileName = sys.argv[1]
-    outputFileName = sys.argv[2]
+f = [0] * inputFileNum
 
-f = open(inputFileName, "r")
 
-domLen = float(f.readline())
-cells = int(f.readline())
-time = float(f.readline())
+for i in range(0, inputFileNum):
+    if len(sys.argv) > 1:
+        inputFileName[i] = sys.argv[i*2 + 1]
+        plotType[i] = sys.argv[i*2 + 2]
 
-dx = domLen/cells
+    f[i] = open(inputFileName[i], "r")
 
-d = []
-u = []
-p = []
-e = []
-x = []
+    domLen[i] = float(f[i].readline())
+    cells[i] = int(f[i].readline())
+    time[i] = float(f[i].readline())
+    dx = domLen[i]/cells[i]
 
-for line in f:
-    aux = line.split(",")
-    d.append(float(aux[0]))
-    u.append(float(aux[1]))
-    p.append(float(aux[2]))
-    e.append(float(aux[3]))
+    d[i] = []
+    u[i] = []
+    p[i] = []
+    e[i] = []
+    x[i] = []
 
-f.close()
+    for line in f[i]:
+        aux = line.split(",")
+        d[i].append(float(aux[0]))
+        u[i].append(float(aux[1]))
+        p[i].append(float(aux[2]))
+        e[i].append(float(aux[3]))
 
-for i in range(0, cells):
-    x.append(i*dx)
-    i = i + 1
+    for j in range(0, cells[i]):
+        x[i].append(j*dx)
+        j = j + 1
 
+    f[i].close
+
+for t in time:
+    if time[0] != t:
+        print("Vstupní data nemají stejný čas")
+        exit() 
+
+outputFileName = sys.argv[inputFileNum*2 + 1]
 
 plt.figure()
 
 plt.subplot(2,2,1)
-plt.plot(x,d)
+plotMultipleCurves(x, d, plotType)
 plt.xlabel("Position")
 plt.ylabel("Density")
 
 plt.subplot(2,2,2)
-plt.plot(x,u)
+plotMultipleCurves(x, u, plotType)
 plt.xlabel("Position")
 plt.ylabel("Velocity")
 
 plt.subplot(2,2,3)
-plt.plot(x,p)
+plotMultipleCurves(x, p, plotType)
 plt.xlabel("Position")
 plt.ylabel("Pressure")
 
 plt.subplot(2,2,4)
-plt.plot(x,e)
+plotMultipleCurves(x, e, plotType)
 plt.xlabel("Position")
 plt.ylabel("Internal energy")
 
-plt.suptitle("t = " + str(time))
+plt.suptitle("t = " + str(time[0]))
 
 plt.tight_layout()
 

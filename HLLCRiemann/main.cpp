@@ -212,6 +212,7 @@ int main(int argc, char** argv)
 
     //saveData(outputFileName, w, domainLenght, n, setTime);
 
+    //predelat na do while
     while (1)
     {
         
@@ -223,30 +224,29 @@ int main(int argc, char** argv)
             f[i] = HLL(w[i-1], w[i]);
         }
 
-        double dt = 0.4 * maxTimeStep(w, dx);
-        time += dt;
+        double dt = 0.4 * maxTimeStep(w, dx);        
         if(setTime - time < dt)
         {
             dt = setTime - time;
             exitCalcualtion = true;
         }
-
+        time += dt;
 
         for (int i = 0; i < n; i++)
         {
             wn[i] = w[i] - dt/dx * (f[i+1] - f[i]);
         }
 
-        for (int i = 0; i < n; i++)
+        w = wn;
+        /*for (int i = 0; i < n; i++)
         {
             w[i] = wn[i];
-        }
+        }*/
 
         iter++;
 
         if(exitCalcualtion)
         {
-            time += dt;
             break;
         }
     }
