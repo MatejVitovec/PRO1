@@ -45,12 +45,6 @@ inline double soundSpeed(const Vector3& w)
 }
 
 
-inline double spectralRadius(const Vector3& w)
-{
-    return fabs(velocity(w)) + soundSpeed(w);
-}
-
-
 inline Vector3 flux(const Vector3& w)
 {
     double u = velocity(w);
@@ -66,15 +60,15 @@ Vector3 primitiveToConservative(Vector3 v)
 }
 
 
-Vector3 riemannInitialCondition(double x, Vector3 stateL, Vector3 stateR, double initDiscontinuityPos)
+Vector3 riemannInitialCondition(double x, Vector3 wl, Vector3 wr, double initDiscontinuityPos)
 {
     if (x < initDiscontinuityPos)
     {
-        return stateL;
+        return wl;
     }
     else
     {
-        return stateR;
+        return wr;
     }
 }
 
@@ -85,7 +79,7 @@ double maxTimeStep(const std::vector<Vector3>& w, double dx)
 
     for (int i = 0; i < w.size(); i++)
     {
-        dt = std::min(dt, dx/spectralRadius(w[i]));
+        dt = std::min(dt, dx/(fabs(velocity(w[i])) + soundSpeed(w[i])));
     }
 
     return dt;
