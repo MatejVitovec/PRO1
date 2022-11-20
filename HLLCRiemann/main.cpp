@@ -101,6 +101,48 @@ double maxTimeStep(const std::vector<Vector3>& w, double dx)
 }
 
 
+inline Vector3 waveSpeedsEstimateC(const Vector3& wl, const Vector3& wr)
+{
+    //PVRS
+    double pl = pressure(wl);
+    double pr = pressure(wr);
+    double ul = velocity(wl);
+    double ur = velocity(wr);
+    double rhol = density(wl);
+    double rhor = density(wr);
+    double ssl = soundSpeed(wl);
+    double ssr = soundSpeed(wr);
+
+    double pStar = std::fmax(0, 0.5*(pl + pr) - 0.125*(ul + ur)*(rhol + rhor)*(ssl + ssr));
+    double ql;
+    double qr;
+
+    if(pStar > pl)
+    {
+        ql = pow(1 + ((GAMMA + 1)/(2*GAMMA))*((pStar/pl) - 1), 0.5);
+    }
+    else
+    {
+        ql = 1;
+    }
+    double sl = ul - ssl*ql;
+
+    if(pStar > pr)
+    {
+        qr = pow(1 + ((GAMMA + 1)/(2*GAMMA))*((pStar/pr) - 1), 0.5);
+    }
+    else
+    {
+        qr = 1;
+    }
+    double sr = ur - ssr*qr;
+
+    double ss = (pr - pl + wl[RHO_U]*(sl - ul) - wr[RHO_U]*(sr - ur))/(wl[RHO]*sl - wl[RHO_U] - wr[RHO]*sr + wr[RHO_U]);
+
+    return Vector3({sl, ss, sr});
+}
+
+
 Vector3 HLL(const Vector3& wl, const Vector3& wr)
 {
     Vector3 lambdaL = waveSpeeds(wl);
@@ -126,9 +168,39 @@ Vector3 HLL(const Vector3& wl, const Vector3& wr)
 
 Vector3 HLLC(const Vector3& wl, const Vector3& wr)
 {
-    //TODO
+    /*Vector3 wSpeed = waveSpeedsEstimateC(wl, wr);
+    double sl = wSpeed[0];
+    double ss = wSpeed[1];
+    double sr = wSpeed[2];*/
 
-    return Vector3();
+
+    Vector3 lambdaL = waveSpeeds(wl);
+    Vector3 lambdaR = waveSpeeds(wr);
+    double sl = std::min(lambdaL[0], lambdaR[0]);
+    double sr = std::max(lambdaL[2], lambdaR[2]);
+    double ss = (pressure(wr) - pressure(wl) + wl[RHO_U]*(sl - velocity(wl)) - wr[RHO_U]*(sr - velocity(wr)))/(wl[RHO]*sl - wl[RHO_U] - wr[RHO]*sr + wr[RHO_U]);
+
+
+    if (0 <= sl)
+    {
+        //FL
+        return flux(wl);
+    }
+    else if(0 <= ss)
+    {
+        //F*L
+        return (ss*(sl*wl - flux(wl)) + sl*(pressure(wl) + density(wl)*(sl - velocity(wl))*(ss - velocity(wl)))*Vector3({0, 1, ss}))/(sl - ss);
+    }
+    else if(0 <= sr)
+    {
+        //F*R
+        return (ss*(sr*wr - flux(wr)) + sr*(pressure(wr) + density(wr)*(sr - velocity(wr))*(ss - velocity(wr)))*Vector3({0, 1, ss}))/(sr - ss);
+    }
+    else
+    {
+        //FR
+        return flux(wr);
+    }
 }
 
 
@@ -184,7 +256,7 @@ void saveData(std::string fileName, std::vector<Vector3> w, double domLen, doubl
 int main(int argc, char** argv)
 {
     std::string inputFileName = "cases/case1.txt";
-    std::string outputFileName = "results/case1result.txt";
+    std::string outputFileName = "results/HLLC.txt";
 
     if(argc == 3)
     {
@@ -223,12 +295,12 @@ int main(int argc, char** argv)
 
     while (1)
     {        
-        f[0] = HLL(w[0], w[0]);
-        f[n] = HLL(w[n-1], w[n-1]);
+        f[0] = HLLC(w[0], w[0]);
+        f[n] = HLLC(w[n-1], w[n-1]);
 
         for (int i = 1; i < n; i++)
         {
-            f[i] = HLL(w[i-1], w[i]);
+            f[i] = HLLC(w[i-1], w[i]);
         }
 
         //CFL = 0.9
@@ -246,10 +318,6 @@ int main(int argc, char** argv)
         }
 
         w = wn;
-        /*for (int i = 0; i < n; i++)
-        {
-            w[i] = wn[i];
-        }*/
 
         iter++;
 
