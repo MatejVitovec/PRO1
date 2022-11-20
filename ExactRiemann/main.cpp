@@ -264,7 +264,7 @@ void saveData(std::string fileName, std::vector<std::vector<double>> data, doubl
 {
     std::ofstream writeToFile(fileName);
     writeToFile << domLen << std::endl;
-    writeToFile << cells << std::endl;
+    writeToFile << cells - 1 << std::endl;
     writeToFile << time << std::endl;
     
 

@@ -144,7 +144,7 @@ inline Vector3 waveSpeedsEstimate(const Vector3& wl, const Vector3& wr)
     }
     double sr = ur + ar*qr;
 
-    double ss = (pr - pl + wl[RHO_U]*(sl - ul) - wr[RHO_U]*(sr - ur))/(wl[RHO]*sl - wl[RHO_U] - wr[RHO]*sr + wr[RHO_U]);
+    double ss = (pr - pl + rhol*ul*(sl - ul) - rhor*ur*(sr - ur))/(rhol*sl - rhol*ul - rhor*sr + rhor*ur);
 
     return Vector3({sl, ss, sr});
 }
