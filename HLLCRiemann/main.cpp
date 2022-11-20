@@ -45,15 +45,6 @@ inline double soundSpeed(const Vector3& w)
 }
 
 
-inline Vector3 waveSpeeds(const Vector3& w)
-{
-    double u = velocity(w);
-    double a = soundSpeed(w);
-
-    return Vector3({u - a, u, u + a});
-}
-
-
 inline double spectralRadius(const Vector3& w)
 {
     return fabs(velocity(w)) + soundSpeed(w);
@@ -101,7 +92,23 @@ double maxTimeStep(const std::vector<Vector3>& w, double dx)
 }
 
 
-inline Vector3 waveSpeedsEstimateC(const Vector3& wl, const Vector3& wr)
+inline Vector3 waveSpeeds(const Vector3& wl, const Vector3& wr)
+{
+    double ul = velocity(wl);
+    double ur = velocity(wr);
+    double al = soundSpeed(wl);
+    double ar = soundSpeed(wr);
+
+    double sl = std::min(ul - al, ur - ar);
+    double sr = std::max(ul + al, ur + ar);
+
+    double ss = (pressure(wr) - pressure(wl) + wl[RHO_U]*(sl - ul) - wr[RHO_U]*(sr - ur))/(wl[RHO]*sl - wl[RHO_U] - wr[RHO]*sr + wr[RHO_U]);
+
+    return Vector3({sl, ss, sr});
+}
+
+
+inline Vector3 waveSpeedsEstimate(const Vector3& wl, const Vector3& wr)
 {
     //PVRS
     double pl = pressure(wl);
@@ -110,10 +117,10 @@ inline Vector3 waveSpeedsEstimateC(const Vector3& wl, const Vector3& wr)
     double ur = velocity(wr);
     double rhol = density(wl);
     double rhor = density(wr);
-    double ssl = soundSpeed(wl);
-    double ssr = soundSpeed(wr);
+    double al = soundSpeed(wl);
+    double ar = soundSpeed(wr);
 
-    double pStar = std::fmax(0, 0.5*(pl + pr) - 0.125*(ul + ur)*(rhol + rhor)*(ssl + ssr));
+    double pStar = std::fmax(0, 0.5*((pl + pr) - 0.25*(ul + ur)*(rhol + rhor)*(al + ar)));
     double ql;
     double qr;
 
@@ -125,7 +132,7 @@ inline Vector3 waveSpeedsEstimateC(const Vector3& wl, const Vector3& wr)
     {
         ql = 1;
     }
-    double sl = ul - ssl*ql;
+    double sl = ul - al*ql;
 
     if(pStar > pr)
     {
@@ -135,7 +142,7 @@ inline Vector3 waveSpeedsEstimateC(const Vector3& wl, const Vector3& wr)
     {
         qr = 1;
     }
-    double sr = ur - ssr*qr;
+    double sr = ur + ar*qr;
 
     double ss = (pr - pl + wl[RHO_U]*(sl - ul) - wr[RHO_U]*(sr - ur))/(wl[RHO]*sl - wl[RHO_U] - wr[RHO]*sr + wr[RHO_U]);
 
@@ -143,13 +150,10 @@ inline Vector3 waveSpeedsEstimateC(const Vector3& wl, const Vector3& wr)
 }
 
 
-Vector3 HLL(const Vector3& wl, const Vector3& wr)
+inline Vector3 HLL(const Vector3& wl, const Vector3& wr)
 {
-    Vector3 lambdaL = waveSpeeds(wl);
-    Vector3 lambdaR = waveSpeeds(wr);
-
-    double sl = std::min(lambdaL[0], lambdaR[0]);
-    double sr = std::max(lambdaL[2], lambdaR[2]);
+    enum {sl, ss, sr};
+    Vector3 wSpeed = waveSpeeds(wl, wr);
 
     if (0 <= sl)
     {
@@ -157,7 +161,7 @@ Vector3 HLL(const Vector3& wl, const Vector3& wr)
     }
     else if (0 < sr)
     {
-        return (sr*flux(wl) - sl*flux(wr) + sl*sr*(wr - wl)) / (sr - sl);
+        return (wSpeed[sr]*flux(wl) - wSpeed[sl]*flux(wr) + wSpeed[sl]*wSpeed[sr]*(wr - wl)) / (wSpeed[sr] - wSpeed[sl]);
     }
     else
     {
@@ -166,35 +170,26 @@ Vector3 HLL(const Vector3& wl, const Vector3& wr)
 }
 
 
-Vector3 HLLC(const Vector3& wl, const Vector3& wr)
+inline Vector3 HLLC(const Vector3& wl, const Vector3& wr)
 {
-    /*Vector3 wSpeed = waveSpeedsEstimateC(wl, wr);
-    double sl = wSpeed[0];
-    double ss = wSpeed[1];
-    double sr = wSpeed[2];*/
+    enum {sl, ss, sr};
+    Vector3 wSpeed = waveSpeedsEstimate(wl, wr);
+    
 
-
-    Vector3 lambdaL = waveSpeeds(wl);
-    Vector3 lambdaR = waveSpeeds(wr);
-    double sl = std::min(lambdaL[0], lambdaR[0]);
-    double sr = std::max(lambdaL[2], lambdaR[2]);
-    double ss = (pressure(wr) - pressure(wl) + wl[RHO_U]*(sl - velocity(wl)) - wr[RHO_U]*(sr - velocity(wr)))/(wl[RHO]*sl - wl[RHO_U] - wr[RHO]*sr + wr[RHO_U]);
-
-
-    if (0 <= sl)
+    if (0 <= wSpeed[sl])
     {
         //FL
         return flux(wl);
     }
-    else if(0 <= ss)
+    else if(0 <= wSpeed[ss])
     {
         //F*L
-        return (ss*(sl*wl - flux(wl)) + sl*(pressure(wl) + density(wl)*(sl - velocity(wl))*(ss - velocity(wl)))*Vector3({0, 1, ss}))/(sl - ss);
+        return (wSpeed[ss]*(wSpeed[sl]*wl - flux(wl)) + wSpeed[sl]*(pressure(wl) + density(wl)*(wSpeed[sl] - velocity(wl))*(wSpeed[ss] - velocity(wl)))*Vector3({0, 1, wSpeed[ss]}))/(wSpeed[sl] - wSpeed[ss]);
     }
-    else if(0 <= sr)
+    else if(0 <= wSpeed[sr])
     {
         //F*R
-        return (ss*(sr*wr - flux(wr)) + sr*(pressure(wr) + density(wr)*(sr - velocity(wr))*(ss - velocity(wr)))*Vector3({0, 1, ss}))/(sr - ss);
+        return (wSpeed[ss]*(wSpeed[sr]*wr - flux(wr)) + wSpeed[sr]*(pressure(wr) + density(wr)*(wSpeed[sr] - velocity(wr))*(wSpeed[ss] - velocity(wr)))*Vector3({0, 1, wSpeed[ss]}))/(wSpeed[sr] - wSpeed[ss]);
     }
     else
     {
@@ -329,7 +324,7 @@ int main(int argc, char** argv)
 
     saveData(outputFileName, w, domainLenght, n, setTime);
 
-    std::cout << "Výpočet proběhl úspěšně s " << iter << " iteracemi." << std::endl;
+    std::cout << "Výpočet v čase t = " << time <<" proběhl úspěšně s " << iter << " iteracemi." << std::endl;
 
     return 0;
 }
