@@ -10,7 +10,7 @@
 using namespace Euler1D;
 using namespace HLLCFlux;
 
-void loadInitBoundaryCondition(std::string fileName, double& lGamma, double& lR, double& time, Vector3& initc, Vector3& inBC, Vector3& outBC)
+void loadInitBoundaryCondition(std::string fileName, double& lGamma, double& lR, double& time, Vector3& initc, Vector3& boundaryCondition)
 {
     std::ifstream file(fileName);
     std::string line;
@@ -30,18 +30,11 @@ void loadInitBoundaryCondition(std::string fileName, double& lGamma, double& lR,
     initc[2] = std::stod(line);
 
     std::getline(file, line);
-    inBC[0] = std::stod(line);
+    boundaryCondition[0] = std::stod(line);
     std::getline(file, line);
-    inBC[1] = std::stod(line);
+    boundaryCondition[1] = std::stod(line);
     std::getline(file, line);
-    inBC[2] = std::stod(line);
-
-    std::getline(file, line);
-    outBC[0] = std::stod(line);
-    std::getline(file, line);
-    outBC[1] = std::stod(line);
-    std::getline(file, line);
-    outBC[2] = std::stod(line);
+    boundaryCondition[2] = std::stod(line);
 
     file.close();
 }
@@ -161,10 +154,14 @@ int main(int argc, char** argv)
 
     double time = 0;
     double setTime;
+    double cfl = 0.9;;
     Vector3 initC;
-    Vector3 inBC;
-    Vector3 outBC;
-    loadInitBoundaryCondition(inputConditionName, GAMMA, R, setTime, initC, inBC, outBC);
+    Vector3 boundaryC;
+    loadInitBoundaryCondition(inputConditionName, GAMMA, R, setTime, initC, boundaryC);
+
+    double pIn = boundaryC[0];
+    double tIn = boundaryC[2];
+    double pOut = boundaryC[3];
 
     int n;
     double dx;
@@ -183,22 +180,44 @@ int main(int argc, char** argv)
         w[i] = wInit;
     }
 
+    /*if((velocity(wIn)/soundSpeed(wIn)) > 1)
+    {
+        std::cout << "Na vstupu je predepsana nadzvukova rychlost" << std::endl;
+    }*/
+
+
+
 
     bool exitCalcualtion = false;
     int iter = 0;
 
     while (1)
-    {        
-        f[0] = HLLC(w[0], w[0]);
-        f[n] = HLLC(w[n-1], w[n-1]);
+    {
+        //TODO
+        Vector3 wIn = primitiveToConservative(Vector3({0, 0, 0}));
+
+        Vector3 wOut;
+
+        f[0] = HLLC(wIn, w[0]);
 
         for (int i = 1; i < n; i++)
         {
             f[i] = HLLC(w[i-1], w[i]);
         }
 
-        //CFL = 0.9
-        double dt = 0.9 * maxTimeStep(w, dx);        
+        if ((velocity(w[n-1])/soundSpeed(w[n-1])) < 1)
+        {            
+            wOut = primitiveToConservative(Vector3({density(w[n-1]), velocity(w[n-1]), pOut}));
+        }
+        else
+        {
+            wOut = w[n-1];
+        }
+
+        f[n] = HLLC(w[n-1], wOut);
+
+
+        double dt = cfl * maxTimeStep(w, dx);
         if(setTime - time < dt)
         {
             dt = setTime - time;
@@ -208,9 +227,9 @@ int main(int argc, char** argv)
 
         for (int i = 0; i < n; i++)
         {
-            wn[i] = w[i] - dt/dx * (f[i+1] - f[i]);
+            wn[i] = w[i] - (dt/A[i])*dA[i]*(flux(w[i]) - Vector3({0, pressure(w[i]), 0})) - (dt/dx)*(f[i+1] - f[i]);
         }
-
+        
         w = wn;
 
         iter++;
@@ -220,6 +239,8 @@ int main(int argc, char** argv)
             break;
         }
     }
+
+    //save
 
     std::cout << "Výpočet v čase t = " << time <<" proběhl úspěšně s " << iter << " iteracemi." << std::endl;
 
