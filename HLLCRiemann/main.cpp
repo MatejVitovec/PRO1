@@ -86,7 +86,7 @@ double maxTimeStep(const std::vector<Vector3>& w, double dx)
 }
 
 
-inline Vector3 waveSpeeds(const Vector3& wl, const Vector3& wr)
+Vector3 waveSpeeds(const Vector3& wl, const Vector3& wr)
 {
     double ul = velocity(wl);
     double ur = velocity(wr);
@@ -102,7 +102,7 @@ inline Vector3 waveSpeeds(const Vector3& wl, const Vector3& wr)
 }
 
 
-inline Vector3 waveSpeedsEstimate(const Vector3& wl, const Vector3& wr)
+Vector3 waveSpeedsEstimate(const Vector3& wl, const Vector3& wr)
 {
     //PVRS
     double pl = pressure(wl);
@@ -144,7 +144,7 @@ inline Vector3 waveSpeedsEstimate(const Vector3& wl, const Vector3& wr)
 }
 
 
-inline Vector3 HLL(const Vector3& wl, const Vector3& wr)
+Vector3 HLL(const Vector3& wl, const Vector3& wr)
 {
     enum {sl, ss, sr};
     Vector3 wSpeed = waveSpeeds(wl, wr);
@@ -164,7 +164,7 @@ inline Vector3 HLL(const Vector3& wl, const Vector3& wr)
 }
 
 
-inline Vector3 HLLC(const Vector3& wl, const Vector3& wr)
+Vector3 HLLC(const Vector3& wl, const Vector3& wr)
 {
     enum {sl, ss, sr};
     Vector3 wSpeed = waveSpeedsEstimate(wl, wr);
