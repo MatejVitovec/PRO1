@@ -13,6 +13,7 @@ namespace Euler1D
     enum {RHO, RHO_U, RHO_E};
 
     double GAMMA;
+    double R;
 
     inline double density(const Vector3& w)
     {
@@ -63,53 +64,16 @@ namespace Euler1D
     {
         return Vector3({v[0], v[0]*v[1], 0.5*v[0]*v[1]*v[1] + (v[2])/(GAMMA - 1)});
     }
-    
-    void loadData(std::string fileName, double& domlen, double& diaph, double& cells, double& lGamma, double& time, Vector3& stateL, Vector3& stateR)
+
+    Vector3 tempVeloPressToConservative(Vector3 in)
     {
-        std::ifstream file(fileName);
-        std::string line;
+        Vector3 w;
 
-        std::getline(file, line);
-        domlen = std::stod(line);
-        std::getline(file, line);
-        diaph = std::stod(line);
-        std::getline(file, line);
-        cells = std::stod(line);
-        std::getline(file, line);
-        lGamma = std::stod(line);
-        std::getline(file, line);
-        time = std::stod(line);
+        w[0] = in[2]/(R*in[0]);
+        w[1] = in[1]*w[0];
+        w[2] = in[2]/(GAMMA - 1);
 
-        std::getline(file, line);
-        stateL[0] = std::stod(line);
-        std::getline(file, line);
-        stateL[1] = std::stod(line);
-        std::getline(file, line);
-        stateL[2] = std::stod(line);
-
-        std::getline(file, line);
-        stateR[0] = std::stod(line);
-        std::getline(file, line);
-        stateR[1] = std::stod(line);
-        std::getline(file, line);
-        stateR[2] = std::stod(line);
-
-        file.close();
-    }
-
-    void saveData(std::string fileName, std::vector<Vector3> w, double domLen, double cells, double time)
-    {
-        std::ofstream writeToFile(fileName);
-        writeToFile << domLen << std::endl;
-        writeToFile << cells << std::endl;
-        writeToFile << time << std::endl;
-
-        for (int i = 0; i < w.size(); i++)
-        {
-            writeToFile << density(w[i]) << ","<< velocity(w[i]) << "," << pressure(w[i]) << "," << internalEnergy(w[i]) << std::endl;
-        }
-        
-        writeToFile.close();
+        return w;
     }
 }
 

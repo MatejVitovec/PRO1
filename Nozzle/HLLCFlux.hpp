@@ -8,22 +8,6 @@ using namespace Euler1D;
 
 namespace HLLCFlux
 {
-    Vector3 waveSpeeds(const Vector3& wl, const Vector3& wr)
-    {
-        double ul = velocity(wl);
-        double ur = velocity(wr);
-        double al = soundSpeed(wl);
-        double ar = soundSpeed(wr);
-
-        double sl = std::min(ul - al, ur - ar);
-        double sr = std::max(ul + al, ur + ar);
-
-        double ss = (pressure(wr) - pressure(wl) + wl[RHO_U]*(sl - ul) - wr[RHO_U]*(sr - ur))/(wl[RHO]*sl - wl[RHO_U] - wr[RHO]*sr + wr[RHO_U]);
-
-        return Vector3({sl, ss, sr});
-    }
-
-
     Vector3 waveSpeedsEstimate(const Vector3& wl, const Vector3& wr)
     {
         //PVRS
@@ -63,26 +47,6 @@ namespace HLLCFlux
         double ss = (pr - pl + rhol*ul*(sl - ul) - rhor*ur*(sr - ur))/(rhol*sl - rhol*ul - rhor*sr + rhor*ur);
 
         return Vector3({sl, ss, sr});
-    }
-
-
-    Vector3 HLL(const Vector3& wl, const Vector3& wr)
-    {
-        enum {sl, ss, sr};
-        Vector3 wSpeed = waveSpeeds(wl, wr);
-
-        if (0 <= sl)
-        {
-            return flux(wl);
-        }
-        else if (0 < sr)
-        {
-            return (wSpeed[sr]*flux(wl) - wSpeed[sl]*flux(wr) + wSpeed[sl]*wSpeed[sr]*(wr - wl)) / (wSpeed[sr] - wSpeed[sl]);
-        }
-        else
-        {
-            return flux(wr);
-        }
     }
 
 

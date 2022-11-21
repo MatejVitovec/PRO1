@@ -10,11 +10,64 @@
 using namespace Euler1D;
 using namespace HLLCFlux;
 
-std::vector<double> loadNozzleData(double& dx, double& firstX)
+void loadInitBoundaryCondition(std::string fileName, double& lGamma, double& lR, double& time, Vector3& initc, Vector3& inBC, Vector3& outBC)
+{
+    std::ifstream file(fileName);
+    std::string line;
+
+    std::getline(file, line);
+    lGamma = std::stod(line);
+    std::getline(file, line);
+    lR = std::stod(line);
+    std::getline(file, line);
+    time = std::stod(line);
+
+    std::getline(file, line);
+    initc[0] = std::stod(line);
+    std::getline(file, line);
+    initc[1] = std::stod(line);
+    std::getline(file, line);
+    initc[2] = std::stod(line);
+
+    std::getline(file, line);
+    inBC[0] = std::stod(line);
+    std::getline(file, line);
+    inBC[1] = std::stod(line);
+    std::getline(file, line);
+    inBC[2] = std::stod(line);
+
+    std::getline(file, line);
+    outBC[0] = std::stod(line);
+    std::getline(file, line);
+    outBC[1] = std::stod(line);
+    std::getline(file, line);
+    outBC[2] = std::stod(line);
+
+    file.close();
+}
+
+
+/*void saveData(std::string fileName, std::vector<Vector3> w, double domLen, double cells, double time)
+{
+    std::ofstream writeToFile(fileName);
+    writeToFile << domLen << std::endl;
+    writeToFile << cells << std::endl;
+    writeToFile << time << std::endl;
+
+    for (int i = 0; i < w.size(); i++)
+    {
+        writeToFile << density(w[i]) << ","<< velocity(w[i]) << "," << pressure(w[i]) << "," << internalEnergy(w[i]) << std::endl;
+    }
+        
+    writeToFile.close();
+}*/
+
+
+std::vector<double> loadNozzleArea(std::string fileName, double& dx, double& firstX, int& cells)
 {
     std::vector<double> out;
 
-    std::ifstream inFile("cases/Nozzle/profile.txt");
+    std::ifstream inFile(fileName);
     std::string xx;
     std::string yy;
     double lastX;
@@ -42,8 +95,29 @@ std::vector<double> loadNozzleData(double& dx, double& firstX)
     }
     inFile.close();
 
+    cells = out.size();
+
     return out;
 }
+
+
+std::vector<double> areaDiff(std::vector<double> area, double dx)
+{
+    std::vector<double> diff;
+
+    diff.push_back((area[1] - area[0])/dx);
+
+    double vectorSize = area.size();
+    for (int i = 1; i < vectorSize - 1; i++)
+    {
+        diff.push_back((area[i+1] - area[i-1])/(2*dx));
+    }
+    
+    diff.push_back((area[vectorSize - 1] - area[vectorSize - 2])/dx);
+
+    return diff;
+}
+
 
 Vector3 initialCondition(double x, Vector3 wl, Vector3 wr, double initDiscontinuityPos)
 {
@@ -71,52 +145,47 @@ double maxTimeStep(const std::vector<Vector3>& w, double dx)
 }
 
 
+
 int main(int argc, char** argv)
 {
-    double dx;
-    double firstX;
-    std::vector<double> A = loadNozzleData(dx, firstX);
+    std::string inputGeometryName = "cases/profile.txt";
+    std::string inputConditionName = "cases/boundaryCondition.txt";
+    std::string outputFileName = "results/nozzle1.txt";
 
-    double a = 5;
-
-
-    /*std::string inputFileName = "cases/case1.txt";
-    std::string outputFileName = "results/HLLC.txt";
-
-    if(argc == 3)
+    if(argc == 4)
     {
-        inputFileName = argv[1];
-        outputFileName = argv[2];
+        inputGeometryName = argv[1];
+        inputConditionName = argv[2];
+        outputFileName = argv[3];
     }
 
-    double domainLenght;
-    double initDiscontinuityPos;
-    double n;
-    double setTime;
-    Vector3 stateL;
-    Vector3 stateR;
-
-    loadData(inputFileName, domainLenght, initDiscontinuityPos, n, GAMMA, setTime, stateL, stateR);
-
-
-    double dx = domainLenght/n;
     double time = 0;
+    double setTime;
+    Vector3 initC;
+    Vector3 inBC;
+    Vector3 outBC;
+    loadInitBoundaryCondition(inputConditionName, GAMMA, R, setTime, initC, inBC, outBC);
 
-    Vector3 wl = primitiveToConservative(stateL);
-    Vector3 wr = primitiveToConservative(stateR);
+    int n;
+    double dx;
+    double firstX;
+    std::vector<double> A = loadNozzleArea("cases/profile.txt", dx, firstX, n);
+    std::vector<double> dA = areaDiff(A, dx);
+
 
     std::vector<Vector3> w(n);
     std::vector<Vector3> wn(n);
     std::vector<Vector3> f(n + 1);
 
+    Vector3 wInit = tempVeloPressToConservative(initC);
     for (int i = 0; i < w.size(); i++)
     {
-        w[i] = initialCondition((i + 0.5)*dx, wl, wr, initDiscontinuityPos);
+        w[i] = wInit;
     }
+
 
     bool exitCalcualtion = false;
     int iter = 0;
-
 
     while (1)
     {        
@@ -152,9 +221,7 @@ int main(int argc, char** argv)
         }
     }
 
-    saveData(outputFileName, w, domainLenght, n, setTime);
-
-    std::cout << "Výpočet v čase t = " << time <<" proběhl úspěšně s " << iter << " iteracemi." << std::endl;*/
+    std::cout << "Výpočet v čase t = " << time <<" proběhl úspěšně s " << iter << " iteracemi." << std::endl;
 
     return 0;
 }
