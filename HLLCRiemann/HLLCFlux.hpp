@@ -1,13 +1,12 @@
-#ifndef APPROXIMATEFLUX_HPP
-#define APPROXIMATEFLUX_HPP
+#ifndef HLLCFLUX_HPP
+#define HLLCFLUX_HPP
 
 #include <cmath>
 #include "Vector3.hpp"
-#include "Euler1D.hpp"
 
 using namespace Euler1D;
 
-namespace ApproximateFlux
+namespace HLLCFlux
 {
     Vector3 waveSpeeds(const Vector3& wl, const Vector3& wr)
     {

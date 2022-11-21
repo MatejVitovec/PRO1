@@ -5,12 +5,47 @@
 #include <vector>
 #include "Vector3.hpp"
 #include "Euler1D.hpp"
-#include "ApproximateFlux.hpp"
+#include "HLLCFlux.hpp"
 
 using namespace Euler1D;
-using namespace ApproximateFlux;
+using namespace HLLCFlux;
 
-Vector3 riemannInitialCondition(double x, Vector3 wl, Vector3 wr, double initDiscontinuityPos)
+std::vector<double> loadNozzleData(double& dx, double& firstX)
+{
+    std::vector<double> out;
+
+    std::ifstream inFile("cases/Nozzle/profile.txt");
+    std::string xx;
+    std::string yy;
+    double lastX;
+
+    inFile >> xx >> yy;
+    firstX = std::stod(xx);
+    out.push_back(std::stod(yy));
+
+    inFile >> xx >> yy;
+    lastX = std::stod(xx);
+    out.push_back(std::stod(yy));
+
+    dx = fabs(fabs(lastX) - fabs(firstX));
+
+    while (inFile >> xx >> yy)
+    {
+        out.push_back(std::stod(yy));
+        double x = std::stod(xx);
+
+        if (ceil(lastX) != ceil(x - dx))
+        {
+            std::cout << "Vstupni data geometrie nemají stejny krok dx" << std::endl;
+        }
+        lastX = x;
+    }
+    inFile.close();
+
+    return out;
+}
+
+Vector3 initialCondition(double x, Vector3 wl, Vector3 wr, double initDiscontinuityPos)
 {
     if (x < initDiscontinuityPos)
     {
@@ -38,10 +73,14 @@ double maxTimeStep(const std::vector<Vector3>& w, double dx)
 
 int main(int argc, char** argv)
 {
-    //TODO
+    double dx;
+    double firstX;
+    std::vector<double> A = loadNozzleData(dx, firstX);
+
+    double a = 5;
 
 
-    std::string inputFileName = "cases/case1.txt";
+    /*std::string inputFileName = "cases/case1.txt";
     std::string outputFileName = "results/HLLC.txt";
 
     if(argc == 3)
@@ -72,7 +111,7 @@ int main(int argc, char** argv)
 
     for (int i = 0; i < w.size(); i++)
     {
-        w[i] = riemannInitialCondition((i + 0.5)*dx, wl, wr, initDiscontinuityPos);
+        w[i] = initialCondition((i + 0.5)*dx, wl, wr, initDiscontinuityPos);
     }
 
     bool exitCalcualtion = false;
@@ -115,7 +154,7 @@ int main(int argc, char** argv)
 
     saveData(outputFileName, w, domainLenght, n, setTime);
 
-    std::cout << "Výpočet v čase t = " << time <<" proběhl úspěšně s " << iter << " iteracemi." << std::endl;
+    std::cout << "Výpočet v čase t = " << time <<" proběhl úspěšně s " << iter << " iteracemi." << std::endl;*/
 
     return 0;
 }

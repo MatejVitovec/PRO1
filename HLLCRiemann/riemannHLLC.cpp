@@ -5,10 +5,10 @@
 #include <vector>
 #include "Vector3.hpp"
 #include "Euler1D.hpp"
-#include "ApproximateFlux.hpp"
+#include "HLLCFlux.hpp"
 
 using namespace Euler1D;
-using namespace ApproximateFlux;
+using namespace HLLCFlux;
 
 Vector3 riemannInitialCondition(double x, Vector3 wl, Vector3 wr, double initDiscontinuityPos)
 {
