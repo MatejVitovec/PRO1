@@ -159,8 +159,8 @@ int main(int argc, char** argv)
     Vector3 boundaryC;
     loadInitBoundaryCondition(inputConditionName, GAMMA, R, setTime, initC, boundaryC);
 
-    double pIn = boundaryC[0];
-    double tIn = boundaryC[2];
+    double pTotIn = boundaryC[0];
+    double tTotIn = boundaryC[2];
     double pOut = boundaryC[3];
 
     int n;
@@ -194,8 +194,17 @@ int main(int argc, char** argv)
     while (1)
     {
         //TODO
-        Vector3 wIn = primitiveToConservative(Vector3({0, 0, 0}));
+        double mIn = velocity(w[0])/soundSpeed(w[0]);
 
+        if(mIn > 1)
+        {
+            std::cout << "Na vstupu se objevila nadzvukova rychlost" << std::endl;
+        }
+
+        double pIn = pTotIn/pow(1.0 + ((GAMMA - 1.0)/2.0)*mIn*mIn, (GAMMA/(GAMMA - 1)));
+        double tIn = tTotIn/(1.0 + ((GAMMA - 1.0)/2.0)*mIn*mIn);
+
+        Vector3 wIn = tempVeloPressToConservative(Vector3({tIn, velocity(w[0]), pIn}));
         Vector3 wOut;
 
         f[0] = HLLC(wIn, w[0]);
