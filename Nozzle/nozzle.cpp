@@ -175,6 +175,12 @@ Vector3 outlet(Vector3 wn, double pOut)
 }
 
 
+Vector3 residue(Vector3 w, Vector3 f0, Vector3 f1, double dx, double A, double dA)
+{
+    return  (-dA/A)*(flux(w) - Vector3({0, pressure(w), 0})) - (1/dx)*(f1 - f0);
+}
+
+
 double maxTimeStep(const std::vector<Vector3>& w, double dx)
 {
     double dt = 10e+100;
@@ -230,7 +236,7 @@ int main(int argc, char** argv)
         w[i] = wInit;
     }
 
-    bool exitCalcualtion = false;
+    bool exitCalculation = false;
     int iter = 0;
 
     while (1)
@@ -247,25 +253,26 @@ int main(int argc, char** argv)
 
         f[n] = HLLC(w[n-1], wOut);
 
-
         double dt = cfl * maxTimeStep(w, dx);
         if(setTime - time < dt)
         {
             dt = setTime - time;
-            exitCalcualtion = true;
+            exitCalculation = true;
         }
         time += dt;
 
         for (int i = 0; i < n; i++)
         {
-            wn[i] = w[i] - (dt/A[i])*dA[i]*(flux(w[i]) - Vector3({0, pressure(w[i]), 0})) - (dt/dx)*(f[i+1] - f[i]);
+            //wn[i] = w[i] - (dt/A[i])*dA[i]*(flux(w[i]) - Vector3({0, pressure(w[i]), 0})) - (dt/dx)*(f[i+1] - f[i]);
+            Vector3 res = residue(w[i], f[i], f[i+1], dx, A[i], dA[i]);
+            wn[i] = w[i] + dt*res;
         }
         
         w = wn;
 
         iter++;
 
-        if(exitCalcualtion || iter > 20000)
+        if(exitCalculation || iter > 20000)
         {
             int a = 0;
             break;
