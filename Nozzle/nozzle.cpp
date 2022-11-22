@@ -40,10 +40,11 @@ void loadInitBoundaryCondition(std::string fileName, double& lGamma, double& lR,
 }
 
 
-/*void saveData(std::string fileName, std::vector<Vector3> w, double domLen, double cells, double time)
+void saveData(std::string fileName, std::vector<Vector3> w, double firstX, double dx, double cells, double time)
 {
     std::ofstream writeToFile(fileName);
-    writeToFile << domLen << std::endl;
+    writeToFile << firstX << std::endl;
+    writeToFile << dx << std::endl;
     writeToFile << cells << std::endl;
     writeToFile << time << std::endl;
 
@@ -53,10 +54,10 @@ void loadInitBoundaryCondition(std::string fileName, double& lGamma, double& lR,
     }
         
     writeToFile.close();
-}*/
+}
 
 
-std::vector<double> loadNozzleArea(std::string fileName, double& dx, double& firstX, int& cells)
+std::vector<double> loadNozzleData(std::string fileName, double& dx, double& firstX, int& cells)
 {
     std::vector<double> out;
 
@@ -125,6 +126,35 @@ Vector3 initialCondition(double x, Vector3 wl, Vector3 wr, double initDiscontinu
 }
 
 
+Vector3 inlet(Vector3 w0, double pTotIn, double tTotIn)
+{
+    double mIn = velocity(w0)/soundSpeed(w0);
+
+    if(mIn > 1)
+    {
+        std::cout << "Na vstupu se objevila nadzvukova rychlost" << std::endl;
+    }
+
+    double pIn = pTotIn/pow(1.0 + ((GAMMA - 1.0)/2.0)*mIn*mIn, (GAMMA/(GAMMA - 1)));
+    double tIn = tTotIn/(1.0 + ((GAMMA - 1.0)/2.0)*mIn*mIn);
+
+    return tempVeloPressToConservative(Vector3({tIn, velocity(w0), pIn}));
+}
+
+
+Vector3 outlet(Vector3 wn, double pOut)
+{
+    if ((velocity(wn)/soundSpeed(wn)) < 1)
+    {            
+        return primitiveToConservative(Vector3({density(wn), velocity(wn), pOut}));
+    }
+    else
+    {
+        return wn;
+    }
+}
+
+
 double maxTimeStep(const std::vector<Vector3>& w, double dx)
 {
     double dt = 10e+100;
@@ -136,7 +166,6 @@ double maxTimeStep(const std::vector<Vector3>& w, double dx)
 
     return dt;
 }
-
 
 
 int main(int argc, char** argv)
@@ -166,7 +195,7 @@ int main(int argc, char** argv)
     int n;
     double dx;
     double firstX;
-    std::vector<double> A = loadNozzleArea("cases/profile.txt", dx, firstX, n);
+    std::vector<double> A = loadNozzleData("cases/profile.txt", dx, firstX, n);
     std::vector<double> dA = areaDiff(A, dx);
 
 
@@ -180,47 +209,20 @@ int main(int argc, char** argv)
         w[i] = wInit;
     }
 
-    /*if((velocity(wIn)/soundSpeed(wIn)) > 1)
-    {
-        std::cout << "Na vstupu je predepsana nadzvukova rychlost" << std::endl;
-    }*/
-
-
-
-
     bool exitCalcualtion = false;
     int iter = 0;
 
     while (1)
     {
-        //TODO
-        double mIn = velocity(w[0])/soundSpeed(w[0]);
 
-        if(mIn > 1)
-        {
-            std::cout << "Na vstupu se objevila nadzvukova rychlost" << std::endl;
-        }
-
-        double pIn = pTotIn/pow(1.0 + ((GAMMA - 1.0)/2.0)*mIn*mIn, (GAMMA/(GAMMA - 1)));
-        double tIn = tTotIn/(1.0 + ((GAMMA - 1.0)/2.0)*mIn*mIn);
-
-        Vector3 wIn = tempVeloPressToConservative(Vector3({tIn, velocity(w[0]), pIn}));
-        Vector3 wOut;
+        Vector3 wIn = inlet(w[0], pTotIn, tTotIn);
+        Vector3 wOut = outlet(w[n-1], pOut);
 
         f[0] = HLLC(wIn, w[0]);
 
         for (int i = 1; i < n; i++)
         {
             f[i] = HLLC(w[i-1], w[i]);
-        }
-
-        if ((velocity(w[n-1])/soundSpeed(w[n-1])) < 1)
-        {            
-            wOut = primitiveToConservative(Vector3({density(w[n-1]), velocity(w[n-1]), pOut}));
-        }
-        else
-        {
-            wOut = w[n-1];
         }
 
         f[n] = HLLC(w[n-1], wOut);
@@ -249,7 +251,7 @@ int main(int argc, char** argv)
         }
     }
 
-    //save
+    saveData(outputFileName, w, firstX, dx, n, time);
 
     std::cout << "Výpočet v čase t = " << time <<" proběhl úspěšně s " << iter << " iteracemi." << std::endl;
 
