@@ -1,7 +1,7 @@
 import sys
 from matplotlib import pyplot as plt
 
-#sys.argv = "", "HLLCRiemann/results/case1exact.txt", "-l", "HLLCRiemann/results/case1result.txt", "-o", "HLLCRiemann/results/case1result.png"
+sys.argv = "", "Nozzle/results/nozzle3.txt", "-l", "Nozzle/results/nozzle3.png"
 
 def plotMultipleCurves(x, y, plotType):
     for i in range(len(x)):
@@ -11,7 +11,6 @@ def plotMultipleCurves(x, y, plotType):
             plotStyle = "k-"
 
         plt.plot(x[i], y[i], plotStyle)
-    a = 5
 
 
 inputFileNum = 1
@@ -22,13 +21,14 @@ if len(sys.argv) > 1:
 inputFileName = [0] * inputFileNum
 plotType = [0] * inputFileNum
 
-domLen = [0] * inputFileNum
+firstX = [0] * inputFileNum
+dx = [0] * inputFileNum
 cells = [0] * inputFileNum
 time = [0] * inputFileNum
 d = [0] * inputFileNum
 u = [0] * inputFileNum
 p = [0] * inputFileNum
-e = [0] * inputFileNum
+ma = [0] * inputFileNum
 x = [0] * inputFileNum
 
 inputFileName[0] = "results/result.txt"
@@ -45,15 +45,16 @@ for i in range(0, inputFileNum):
 
     f[i] = open(inputFileName[i], "r")
 
-    domLen[i] = float(f[i].readline())
+    firstX[i] = float(f[i].readline())
+    dx = float(f[i].readline())
     cells[i] = int(f[i].readline())
     time[i] = float(f[i].readline())
-    dx = domLen[i]/cells[i]
+    
 
     d[i] = []
     u[i] = []
     p[i] = []
-    e[i] = []
+    ma[i] = []
     x[i] = []
 
     for line in f[i]:
@@ -61,10 +62,10 @@ for i in range(0, inputFileNum):
         d[i].append(float(aux[0]))
         u[i].append(float(aux[1]))
         p[i].append(float(aux[2]))
-        e[i].append(float(aux[3]))
+        ma[i].append(float(aux[3]))
 
     for j in range(0, cells[i]):
-        x[i].append(j*dx)
+        x[i].append(j*dx + firstX[i])
         j = j + 1
 
     f[i].close
@@ -94,9 +95,9 @@ plt.xlabel("Position")
 plt.ylabel("Pressure")
 
 plt.subplot(2,2,4)
-plotMultipleCurves(x, e, plotType)
+plotMultipleCurves(x, ma, plotType)
 plt.xlabel("Position")
-plt.ylabel("Internal energy")
+plt.ylabel("Mach number")
 
 plt.suptitle("t = " + str(time[0]))
 

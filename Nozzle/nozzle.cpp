@@ -50,7 +50,7 @@ void saveData(std::string fileName, std::vector<Vector3> w, double firstX, doubl
 
     for (int i = 0; i < w.size(); i++)
     {
-        writeToFile << density(w[i]) << ","<< velocity(w[i]) << "," << pressure(w[i]) << "," << internalEnergy(w[i]) << std::endl;
+        writeToFile << density(w[i]) << ","<< velocity(w[i]) << "," << pressure(w[i]) << "," << (velocity(w[i])/soundSpeed(w[i])) << std::endl;
     }
         
     writeToFile.close();
@@ -95,6 +95,25 @@ std::vector<double> loadNozzleData(std::string fileName, double& dx, double& fir
 }
 
 
+//testovaci funkce zadana rovnici
+std::vector<double> loadNozzleTest(std::string fileName, double& dx, double& firstX, int& cells)
+{
+    std::vector<double> out;    
+    cells = 400;
+    dx = 1.0/cells;
+    firstX = 0.0;
+
+    double x = firstX;
+    for (int i = 0; i < cells; i++)
+    {
+        out.push_back(1.0 + (x - 0.5)*(x - 0.5));
+        x += dx;
+    }
+
+    return out;
+}
+
+
 std::vector<double> areaDiff(std::vector<double> area, double dx)
 {
     std::vector<double> diff;
@@ -113,32 +132,33 @@ std::vector<double> areaDiff(std::vector<double> area, double dx)
 }
 
 
-Vector3 initialCondition(double x, Vector3 wl, Vector3 wr, double initDiscontinuityPos)
+Vector3 inlet(Vector3 w0, double pTot, double tempTot)
 {
-    if (x < initDiscontinuityPos)
-    {
-        return wl;
-    }
-    else
-    {
-        return wr;
-    }
+    double p = std::min(pressure(w0), pTot);
+    double m2 = (2.0/(GAMMA - 1.0))*(pow((p/pTot), ((1.0 - GAMMA)/GAMMA)) - 1.0);
+    double temp = tempTot/(1.0 + ((GAMMA - 1.0)/2.0)*m2);
+    double rho = p/(temp*R);
+    double u = sqrt(m2*((GAMMA*p)/rho));
+
+    return primitiveToConservative(Vector3({rho, u, p}));
 }
 
 
-Vector3 inlet(Vector3 w0, double pTotIn, double tTotIn)
+//testovaci okrajova podminka celkovy tlak a celkova hustota
+Vector3 inletTest(Vector3 w0, double pTot, double rhoTot)
 {
-    double mIn = velocity(w0)/soundSpeed(w0);
-
-    if(mIn > 1)
+    double p = std::min(pressure(w0), pTot);
+    if (pressure(w0) < pTot)
     {
-        std::cout << "Na vstupu se objevila nadzvukova rychlost" << std::endl;
+        int a = 0;
     }
+    p = pTot;
+    
+    double m2 = (2.0/(GAMMA - 1.0))*(pow((p/pTot), ((1.0 - GAMMA)/GAMMA)) - 1.0);
+    double rho = pow(rhoTot*(1.0 + ((GAMMA - 1.0)/2)*m2), 1.0/(1.0 - GAMMA));
+    double u = sqrt(m2*GAMMA*(p/rho));
 
-    double pIn = pTotIn/pow(1.0 + ((GAMMA - 1.0)/2.0)*mIn*mIn, (GAMMA/(GAMMA - 1)));
-    double tIn = tTotIn/(1.0 + ((GAMMA - 1.0)/2.0)*mIn*mIn);
-
-    return tempVeloPressToConservative(Vector3({tIn, velocity(w0), pIn}));
+    return primitiveToConservative(Vector3({rho, u, p}));
 }
 
 
@@ -161,6 +181,7 @@ double maxTimeStep(const std::vector<Vector3>& w, double dx)
 
     for (int i = 0; i < w.size(); i++)
     {
+        //min(dt, dx/spectral radius)
         dt = std::min(dt, dx/(fabs(velocity(w[i])) + soundSpeed(w[i])));
     }
 
@@ -171,8 +192,8 @@ double maxTimeStep(const std::vector<Vector3>& w, double dx)
 int main(int argc, char** argv)
 {
     std::string inputGeometryName = "cases/profile.txt";
-    std::string inputConditionName = "cases/boundaryCondition.txt";
-    std::string outputFileName = "results/nozzle1.txt";
+    std::string inputConditionName = "cases/testCase.txt";
+    std::string outputFileName = "results/nozzle3.txt";
 
     if(argc == 4)
     {
@@ -183,19 +204,19 @@ int main(int argc, char** argv)
 
     double time = 0;
     double setTime;
-    double cfl = 0.9;;
+    double cfl = 0.8;
     Vector3 initC;
     Vector3 boundaryC;
     loadInitBoundaryCondition(inputConditionName, GAMMA, R, setTime, initC, boundaryC);
 
     double pTotIn = boundaryC[0];
-    double tTotIn = boundaryC[2];
-    double pOut = boundaryC[3];
+    double tTotIn = boundaryC[1];
+    double pOut = boundaryC[2];
 
     int n;
     double dx;
     double firstX;
-    std::vector<double> A = loadNozzleData("cases/profile.txt", dx, firstX, n);
+    std::vector<double> A = loadNozzleTest(inputGeometryName, dx, firstX, n);
     std::vector<double> dA = areaDiff(A, dx);
 
 
@@ -203,7 +224,7 @@ int main(int argc, char** argv)
     std::vector<Vector3> wn(n);
     std::vector<Vector3> f(n + 1);
 
-    Vector3 wInit = tempVeloPressToConservative(initC);
+    Vector3 wInit = primitiveToConservative(initC);
     for (int i = 0; i < w.size(); i++)
     {
         w[i] = wInit;
@@ -214,7 +235,6 @@ int main(int argc, char** argv)
 
     while (1)
     {
-
         Vector3 wIn = inlet(w[0], pTotIn, tTotIn);
         Vector3 wOut = outlet(w[n-1], pOut);
 
@@ -245,8 +265,9 @@ int main(int argc, char** argv)
 
         iter++;
 
-        if(exitCalcualtion)
+        if(exitCalcualtion || iter > 20000)
         {
+            int a = 0;
             break;
         }
     }
