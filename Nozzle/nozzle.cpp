@@ -57,7 +57,21 @@ void saveData(std::string fileName, std::vector<Vector3> w, double firstX, doubl
 }
 
 
-std::vector<double> loadNozzleData(std::string fileName, double& dx, double& firstX, int& cells)
+void saveRes(std::string fileName, std::vector<double> history, int dIter)
+{
+    std::ofstream writeToFile(fileName);
+    writeToFile << dIter << std::endl;
+
+    for (int i = 0; i < history.size(); i++)
+    {
+        writeToFile << history[i] << std::endl;
+    }
+        
+    writeToFile.close();
+}
+
+
+std::vector<double> loadNozzleGeometry(std::string fileName, double& dx, double& firstX, int& cells)
 {
     std::vector<double> out;
 
@@ -78,7 +92,8 @@ std::vector<double> loadNozzleData(std::string fileName, double& dx, double& fir
 
     while (inFile >> xx >> yy)
     {
-        out.push_back(std::stod(yy));
+        //0.22 = y*2*d(110 mm)
+        out.push_back(std::stod(yy)/**0.22*/);        
         double x = std::stod(xx);
 
         if (ceil(lastX) != ceil(x - dx))
@@ -95,8 +110,7 @@ std::vector<double> loadNozzleData(std::string fileName, double& dx, double& fir
 }
 
 
-//testovaci funkce zadana rovnici
-std::vector<double> loadNozzleTest(std::string fileName, double& dx, double& firstX, int& cells)
+std::vector<double> loadNozzleGeometryTest(std::string fileName, double& dx, double& firstX, int& cells)
 {
     std::vector<double> out;    
     cells = 400;
@@ -132,7 +146,7 @@ std::vector<double> areaDiff(std::vector<double> area, double dx)
 }
 
 
-Vector3 inlet(Vector3 w0, double pTot, double tempTot)
+Vector3 inletPressureTemperature(Vector3 w0, double pTot, double tempTot)
 {
     double p = std::min(pressure(w0), pTot);
     double m2 = (2.0/(GAMMA - 1.0))*(pow((p/pTot), ((1.0 - GAMMA)/GAMMA)) - 1.0);
@@ -144,8 +158,7 @@ Vector3 inlet(Vector3 w0, double pTot, double tempTot)
 }
 
 
-//testovaci okrajova podminka celkovy tlak a celkova hustota
-Vector3 inletTest(Vector3 w0, double pTot, double rhoTot)
+Vector3 inletPressureDensity(Vector3 w0, double pTot, double rhoTot)
 {
     double p = std::min(pressure(w0), pTot);
     if (pressure(w0) < pTot)
@@ -189,11 +202,26 @@ double maxTimeStep(const std::vector<Vector3>& w, double dx)
 }
 
 
+double calcResidueDensity(const std::vector<Vector3> w)
+{
+    double res = 0;
+
+    int n = w.size();
+
+    for (int i = 1; i < n; i++)
+    {
+        res += (density(w[i-1]) - density(w[i]));
+    }
+
+    return res/n;
+}
+
+
 int main(int argc, char** argv)
 {
     std::string inputGeometryName = "cases/profile.txt";
-    std::string inputConditionName = "cases/testCase.txt";
-    std::string outputFileName = "results/nozzle3.txt";
+    std::string inputConditionName = "cases/case1.txt";
+    std::string outputFileName = "results/case1.txt";
 
     if(argc == 4)
     {
@@ -216,7 +244,7 @@ int main(int argc, char** argv)
     int n;
     double dx;
     double firstX;
-    std::vector<double> A = loadNozzleTest(inputGeometryName, dx, firstX, n);
+    std::vector<double> A = loadNozzleGeometry(inputGeometryName, dx, firstX, n);
     std::vector<double> dA = areaDiff(A, dx);
 
 
@@ -224,7 +252,9 @@ int main(int argc, char** argv)
     std::vector<Vector3> wn(n);
     std::vector<Vector3> f(n + 1);
 
-    Vector3 wInit = primitiveToConservative(initC);
+    std::vector<double> history;
+
+    Vector3 wInit = tempVeloPressToConservative(initC);
     for (int i = 0; i < w.size(); i++)
     {
         w[i] = wInit;
@@ -232,10 +262,11 @@ int main(int argc, char** argv)
 
     bool exitCalculation = false;
     int iter = 0;
+    int dIter = 50;
 
     while (1)
     {
-        Vector3 wIn = inlet(w[0], pTotIn, tTotIn);
+        Vector3 wIn = inletPressureTemperature(w[0], pTotIn, tTotIn);
         Vector3 wOut = outlet(w[n-1], pOut);
 
         f[0] = HLLC(wIn, w[0]);
@@ -262,9 +293,14 @@ int main(int argc, char** argv)
         
         w = wn;
 
-        iter++;
+        if(iter % dIter == 0)
+        {
+            history.push_back(calcResidueDensity(w));
+        }
 
-        if(exitCalculation || iter > 20000)
+        ++iter;
+
+        if(exitCalculation || iter >= 20000)
         {
             int a = 0;
             break;
@@ -272,6 +308,7 @@ int main(int argc, char** argv)
     }
 
     saveData(outputFileName, w, firstX, dx, n, time);
+    saveRes("results/case1Res.txt", history, dIter);
 
     std::cout << "Výpočet v čase t = " << time <<" proběhl úspěšně s " << iter << " iteracemi." << std::endl;
 

@@ -1,7 +1,7 @@
 import sys
 from matplotlib import pyplot as plt
 
-sys.argv = "", "Nozzle/results/nozzle3.txt", "-l", "Nozzle/results/nozzle3.png"
+sys.argv = "", "Nozzle/results/case1.txt", "-l", "Nozzle/results/case1.png"
 
 def plotMultipleCurves(x, y, plotType):
     for i in range(len(x)):
