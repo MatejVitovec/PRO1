@@ -175,12 +175,6 @@ Vector3 outlet(Vector3 wn, double pOut)
 }
 
 
-Vector3 residue(Vector3 w, Vector3 f0, Vector3 f1, double dx, double A, double dA)
-{
-    return  (-dA/A)*(flux(w) - Vector3({0, pressure(w), 0})) - (1/dx)*(f1 - f0);
-}
-
-
 double maxTimeStep(const std::vector<Vector3>& w, double dx)
 {
     double dt = 10e+100;
@@ -263,9 +257,7 @@ int main(int argc, char** argv)
 
         for (int i = 0; i < n; i++)
         {
-            //wn[i] = w[i] - (dt/A[i])*dA[i]*(flux(w[i]) - Vector3({0, pressure(w[i]), 0})) - (dt/dx)*(f[i+1] - f[i]);
-            Vector3 res = residue(w[i], f[i], f[i+1], dx, A[i], dA[i]);
-            wn[i] = w[i] + dt*res;
+            wn[i] = w[i] - (dt/A[i])*dA[i]*(flux(w[i]) - Vector3({0, pressure(w[i]), 0})) - (dt/dx)*(f[i+1] - f[i]);
         }
         
         w = wn;
