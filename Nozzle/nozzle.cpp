@@ -202,15 +202,15 @@ double maxTimeStep(const std::vector<Vector3>& w, double dx)
 }
 
 
-double calcResidueDensity(const std::vector<Vector3> w)
+double calcResidueDensity(const std::vector<Vector3> wn, const std::vector<Vector3> w)
 {
     double res = 0;
 
     int n = w.size();
 
-    for (int i = 1; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
-        res += (density(w[i-1]) - density(w[i]));
+        res += (density(w[i]) - density(wn[i]));
     }
 
     return res/n;
@@ -291,16 +291,16 @@ int main(int argc, char** argv)
             wn[i] = w[i] - (dt/A[i])*dA[i]*(flux(w[i]) - Vector3({0, pressure(w[i]), 0})) - (dt/dx)*(f[i+1] - f[i]);
         }
         
-        w = wn;
-
         if(iter % dIter == 0)
         {
-            history.push_back(calcResidueDensity(w));
+            history.push_back(calcResidueDensity(wn, w));
         }
+
+        w = wn;
 
         ++iter;
 
-        if(exitCalculation || iter >= 20000)
+        if(exitCalculation || iter >= 5000)
         {
             int a = 0;
             break;
