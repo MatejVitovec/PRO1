@@ -2,6 +2,7 @@
 #define HLLCFLUX_HPP
 
 #include <cmath>
+#include <vector>
 #include "Vector3.hpp"
 
 using namespace Euler1D;
@@ -77,6 +78,18 @@ namespace HLLCFlux
             return flux(wr);
         }
     }
+
+    void calcHLLCFluxes(std::vector<Vector3>& f, const std::vector<Vector3>& w, const Vector3& wIn, const Vector3& wOut)
+    {
+        f[0] = HLLC(wIn, w[0]);
+        int n = w.size();
+        for (int i = 1; i < n; i++)
+        {
+            f[i] = HLLC(w[i-1], w[i]);
+        }
+        f[n] = HLLC(w[n-1], wOut);
+    }
+    
 }
 
 #endif

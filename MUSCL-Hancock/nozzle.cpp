@@ -188,6 +188,39 @@ Vector3 outlet(Vector3 wn, double pOut)
 }
 
 
+Vector3 sourceTerm(Vector3 w, double A, double dA)
+{
+    return (dA/A)*(flux(w) - Vector3({0, pressure(w), 0}));
+}
+
+
+void calcSourceTerms(std::vector<Vector3>& S, const std::vector<Vector3>& w, const std::vector<double>& A, const std::vector<double>& dA)
+{
+    for (int i = 0; i < S.size(); i++)
+    {
+        S[i] = (sourceTerm(w[i], A[i], dA[i]));
+    }
+}
+
+
+void calcResiduals(std::vector<Vector3>& res, const std::vector<Vector3>& f, const std::vector<Vector3>& S, const double& dx)
+{
+    for (int i = 0; i < res.size(); i++)
+    {
+        res[i] = (1/dx)*(f[i+1] - f[i]) + S[i];
+    }
+}
+
+
+void explicitEulerSolve(std::vector<Vector3>& wn, const std::vector<Vector3>& w, const std::vector<Vector3>& res, const double& dt)
+{
+    for (int i = 0; i < res.size(); i++)
+    {
+        wn[i] = w[i] - dt*res[i];
+    }
+}
+
+
 double maxTimeStep(const std::vector<Vector3>& w, double dx)
 {
     double dt = 10e+100;
@@ -250,7 +283,9 @@ int main(int argc, char** argv)
 
     std::vector<Vector3> w(n);
     std::vector<Vector3> wn(n);
-    std::vector<Vector3> f(n + 1);
+    std::vector<Vector3> f(n+1);
+    std::vector<Vector3> S(n);
+    std::vector<Vector3> res(n);
 
     std::vector<double> history;
 
@@ -269,27 +304,16 @@ int main(int argc, char** argv)
         Vector3 wIn = inletPressureTemperature(w[0], pTotIn, tTotIn);
         Vector3 wOut = outlet(w[n-1], pOut);
 
-        f[0] = HLLC(wIn, w[0]);
+        calcHLLCFluxes(f, w, wIn, wOut);
 
-        for (int i = 1; i < n; i++)
-        {
-            f[i] = HLLC(w[i-1], w[i]);
-        }
+        calcSourceTerms(S, w, A, dA);
 
-        f[n] = HLLC(w[n-1], wOut);
+        calcResiduals(res, f, S, dx);
 
         double dt = cfl * maxTimeStep(w, dx);
-        if(setTime - time < dt)
-        {
-            dt = setTime - time;
-            exitCalculation = true;
-        }
         time += dt;
 
-        for (int i = 0; i < n; i++)
-        {
-            wn[i] = w[i] - (dt/A[i])*dA[i]*(flux(w[i]) - Vector3({0, pressure(w[i]), 0})) - (dt/dx)*(f[i+1] - f[i]);
-        }
+        explicitEulerSolve(wn, w, res, dt);
         
         if(iter % dIter == 0)
         {
@@ -300,9 +324,8 @@ int main(int argc, char** argv)
 
         ++iter;
 
-        if(exitCalculation || iter >= 5000)
+        if(exitCalculation || iter >= 20000)
         {
-            int a = 0;
             break;
         }
     }
