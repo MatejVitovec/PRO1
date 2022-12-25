@@ -194,30 +194,57 @@ Vector3 sourceTerm(Vector3 w, double A, double dA)
 }
 
 
-void calcSourceTerms(std::vector<Vector3>& S, const std::vector<Vector3>& w, const std::vector<double>& A, const std::vector<double>& dA)
+/*void calcSourceTerms(std::vector<Vector3>& S, const std::vector<Vector3>& w, const std::vector<double>& A, const std::vector<double>& dA)
 {
     for (int i = 0; i < S.size(); i++)
     {
         S[i] = (sourceTerm(w[i], A[i], dA[i]));
     }
+}*/
+std::vector<Vector3> calcSourceTerms(const std::vector<Vector3>& w, const std::vector<double>& A, const std::vector<double>& dA)
+{
+    std::vector<Vector3> S;
+    for (int i = 0; i < w.size(); i++)
+    {
+        S.push_back(sourceTerm(w[i], A[i], dA[i]));
+    }
+    return S;
 }
 
 
-void calcResiduals(std::vector<Vector3>& res, const std::vector<Vector3>& f, const std::vector<Vector3>& S, const double& dx)
+/*void calcResiduals(std::vector<Vector3>& res, const std::vector<Vector3>& f, const std::vector<Vector3>& S, const double& dx)
 {
     for (int i = 0; i < res.size(); i++)
     {
         res[i] = (1/dx)*(f[i+1] - f[i]) + S[i];
     }
+}*/
+std::vector<Vector3> calcResiduals(const std::vector<Vector3>& f, const std::vector<Vector3>& S, const double& dx)
+{
+    std::vector<Vector3> res;
+
+    for (int i = 0; i < f.size()-1; i++)
+    {
+        res.push_back((1/dx)*(f[i+1] - f[i]) + S[i]);
+    }
+    return res;
 }
 
-
-void explicitEulerSolve(std::vector<Vector3>& wn, const std::vector<Vector3>& w, const std::vector<Vector3>& res, const double& dt)
+/*void explicitEulerSolve(std::vector<Vector3>& wn, const std::vector<Vector3>& w, const std::vector<Vector3>& res, const double& dt)
 {
     for (int i = 0; i < res.size(); i++)
     {
         wn[i] = w[i] - dt*res[i];
     }
+}*/
+std::vector<Vector3> explicitEulerSolve(const std::vector<Vector3>& w, const std::vector<Vector3>& res, const double& dt)
+{
+    std::vector<Vector3> wn;
+    for (int i = 0; i < res.size(); i++)
+    {
+        wn.push_back(w[i] - dt*res[i]);
+    }
+    return wn;
 }
 
 
@@ -233,6 +260,8 @@ double maxTimeStep(const std::vector<Vector3>& w, double dx)
 
     return dt;
 }
+
+
 
 
 double calcResidueDensity(const std::vector<Vector3> wn, const std::vector<Vector3> w)
@@ -304,16 +333,20 @@ int main(int argc, char** argv)
         Vector3 wIn = inletPressureTemperature(w[0], pTotIn, tTotIn);
         Vector3 wOut = outlet(w[n-1], pOut);
 
-        calcHLLCFluxes(f, w, wIn, wOut);
+        //calcHLLCFluxes(f, w, wIn, wOut);
+        f = calcHLLCFluxes(w, wIn, wOut);
 
-        calcSourceTerms(S, w, A, dA);
+        //calcSourceTerms(S, w, A, dA);
+        S = calcSourceTerms(w, A, dA);
 
-        calcResiduals(res, f, S, dx);
+        //calcResiduals(res, f, S, dx);
+        res = calcResiduals(f, S, dx);
 
         double dt = cfl * maxTimeStep(w, dx);
         time += dt;
 
-        explicitEulerSolve(wn, w, res, dt);
+        //explicitEulerSolve(wn, w, res, dt);
+        wn = explicitEulerSolve(w, res, dt);
         
         if(iter % dIter == 0)
         {

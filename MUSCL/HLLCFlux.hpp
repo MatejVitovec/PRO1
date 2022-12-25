@@ -79,7 +79,7 @@ namespace HLLCFlux
         }
     }
 
-    void calcHLLCFluxes(std::vector<Vector3>& f, const std::vector<Vector3>& w, const Vector3& wIn, const Vector3& wOut)
+    /*void calcHLLCFluxes(std::vector<Vector3>& f, const std::vector<Vector3>& w, const Vector3& wIn, const Vector3& wOut)
     {
         f[0] = HLLC(wIn, w[0]);
         int n = w.size();
@@ -88,6 +88,24 @@ namespace HLLCFlux
             f[i] = HLLC(w[i-1], w[i]);
         }
         f[n] = HLLC(w[n-1], wOut);
+    }*/
+
+    std::vector<Vector3> calcHLLCFluxes(const std::vector<Vector3>& w, const Vector3& wIn, const Vector3& wOut)
+    {
+        std::vector<Vector3> f;
+
+        int n = w.size();
+
+        f.push_back(HLLC(wIn, w[0]));
+
+        for (int i = 1; i < n; i++)
+        {
+            f.push_back(HLLC(w[i-1], w[i]));
+        }
+
+        f.push_back(HLLC(w[n-1], wOut));
+
+        return f;
     }
     
 }
