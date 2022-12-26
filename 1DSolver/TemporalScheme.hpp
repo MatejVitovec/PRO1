@@ -10,8 +10,7 @@
 class TemporalScheme
 {
     public:
-        virtual std::vector<Vector3> Solve(const std::vector<Vector3>& w) const = 0;
-        void setCfl(double cfl);
+        virtual std::vector<Vector3> solve(const std::vector<Vector3>& w, double dt, double dx) const = 0;
         void setEquationModel(std::shared_ptr<EulerEquations> euler);
         void setSpatialScheme(std::shared_ptr<SpatialScheme> spcScheme);
 
@@ -19,9 +18,8 @@ class TemporalScheme
         std::shared_ptr<EulerEquations> eulerEqn;
         std::shared_ptr<SpatialScheme> spaceScheme;
 
-        double cfl;
 
-        virtual double timeStep(std::vector<Vector3> w, double dx) const;
+        
     
 };
 

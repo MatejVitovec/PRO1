@@ -89,7 +89,7 @@ std::vector<Vector3> Muscl::calcRStates(const std::vector<Vector3>& w, const std
 }
 
 
-std::vector<Vector3> Muscl::calculateResidues(const std::vector<Vector3> w) const
+std::vector<Vector3> Muscl::calculateResidues(const std::vector<Vector3> w, double dx) const
 {
     std::vector<Vector3> res;
 

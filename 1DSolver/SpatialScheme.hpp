@@ -10,7 +10,7 @@
 class SpatialScheme
 {
     public:
-        virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3>& w) const = 0;
+        virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3>& w, double dx) const = 0;
         void setEquationModel(std::shared_ptr<EulerEquations> euler);
 
     protected:
