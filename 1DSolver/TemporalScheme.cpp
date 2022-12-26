@@ -3,12 +3,13 @@
 
 
 
-void TemporalScheme::setEquationModel(std::shared_ptr<EulerEquations> euler)
-{
-    eulerEqn = euler;
-}
-
 void TemporalScheme::setSpatialScheme(std::shared_ptr<SpatialScheme> spcScheme)
 {
     spaceScheme = spcScheme;
 }
+
+void TemporalScheme::setSourceTerm(std::shared_ptr<SourceTerm> srcTerm)
+{
+    sourceTerm = srcTerm;
+}
+

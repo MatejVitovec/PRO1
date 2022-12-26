@@ -5,22 +5,21 @@
 #include "Vector3.hpp"
 #include "EulerEquations.hpp"
 #include "SpatialScheme.hpp"
+#include "SourceTerm.hpp"
 
 
 class TemporalScheme
 {
     public:
         virtual std::vector<Vector3> solve(const std::vector<Vector3>& w, double dt, double dx) const = 0;
-        void setEquationModel(std::shared_ptr<EulerEquations> euler);
         void setSpatialScheme(std::shared_ptr<SpatialScheme> spcScheme);
+        void setSourceTerm(std::shared_ptr<SourceTerm> srcTerm);
 
     protected:
-        std::shared_ptr<EulerEquations> eulerEqn;
         std::shared_ptr<SpatialScheme> spaceScheme;
+        std::shared_ptr<SourceTerm> sourceTerm;
 
 
-        
-    
 };
 
 #endif // TEMPORALSCHEME_H

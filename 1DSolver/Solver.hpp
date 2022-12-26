@@ -8,6 +8,7 @@
 #include "Mesh.hpp"
 #include "SpatialScheme.hpp"
 #include "TemporalScheme.hpp"
+#include "BoundaryCondition.hpp"
 
 
 class Solver
@@ -22,9 +23,8 @@ class Solver
         void setSpatialScheme(std::shared_ptr<SpatialScheme> spcScheme);
         void setTemporalScheme(std::shared_ptr<TemporalScheme> tmpScheme);
 
-        std::vector<Vector3> solveOneIter(const std::vector<Vector3>& w, double cfl) const;
-        std::vector<Vector3> stream(const std::vector<Vector3>& w, Vector3 inlet, Vector3 outlet) const;
-        std::vector<Vector3> solve(std::vector<Vector3> w, const int& iter, const double& cfl) const;
+        std::vector<Vector3> overwriteBC(std::vector<Vector3> w, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet) const;
+        std::vector<Vector3> solve(std::vector<Vector3> w, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl) const;
 
 
     protected:

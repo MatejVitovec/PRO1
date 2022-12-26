@@ -13,16 +13,18 @@ class Mesh
 {
     public:
         Mesh();
-        Mesh(double domain, double n);
+        Mesh(double dom, double nCells, double startPos);
+        
         double getDx();
         double getCells();
-        double detDomain();
+        double getDomain();
+        double getFirstX();
 
-
-    private:
+    protected:
         double dx;
-        double n;
+        double cells;
         double domain;
+        double firstX;
 
 };
 

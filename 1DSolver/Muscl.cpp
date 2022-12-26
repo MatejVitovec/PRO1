@@ -8,9 +8,8 @@ Muscl::Muscl()
 
 }
 
-Muscl::Muscl(std::shared_ptr<EulerEquations> euler, std::shared_ptr<RiemannSolver> riemann, std::shared_ptr<SlopeLimiter> limiter)
+Muscl::Muscl( std::shared_ptr<RiemannSolver> riemann, std::shared_ptr<SlopeLimiter> limiter)
 {
-    setEquationModel(euler);
     setRiemannSolver(riemann);
     setLimiter(limiter);
 }

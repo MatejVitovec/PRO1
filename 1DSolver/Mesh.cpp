@@ -7,11 +7,12 @@ Mesh::Mesh()
     
 }
 
-Mesh::Mesh(double dom, double cells)
+Mesh::Mesh(double dom, double nCells, double startPos)
 {
     domain = dom;
-    n = cells;
+    cells = nCells;
     dx = dom/cells;
+    firstX = startPos;
 }
 
 double Mesh::getDx()
@@ -21,10 +22,15 @@ double Mesh::getDx()
 
 double Mesh::getCells()
 {
-    return n;
+    return cells;
 }
 
-double Mesh::detDomain()
+double Mesh::getDomain()
 {
     return domain;
+}
+
+double Mesh::getFirstX()
+{
+    return firstX;
 }

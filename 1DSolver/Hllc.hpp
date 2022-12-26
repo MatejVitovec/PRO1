@@ -17,8 +17,6 @@ class Hllc : public RiemannSolver
         virtual std::vector<Vector3> calculateFluxes(const std::vector<Vector3>& wl, const std::vector<Vector3>& wr) const;
 
     private:
-
-
         Vector3 waveSpeedsEstimate(const Vector3& wl, const Vector3& wr) const;
 
 };
