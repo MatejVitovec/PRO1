@@ -61,6 +61,16 @@ inline Vector3 operator* (double a, const Vector3& u)
     return out;
 }
 
+// w * u
+inline Vector3 operator* (const Vector3& w, const Vector3& u)
+{
+    Vector3 out;
+    out[0] = w[0] * u[0];
+    out[1] = w[1] * u[1];
+    out[2] = w[2] * u[2];
+    return out;
+}
+
 // u / a
 inline Vector3 operator/ (const Vector3& u, double a)
 {

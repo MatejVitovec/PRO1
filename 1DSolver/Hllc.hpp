@@ -1,6 +1,7 @@
 #ifndef HLLC_H
 #define HLLC_H
 
+#include <vector>
 #include "Vector3.hpp"
 #include "EulerEquations.hpp"
 
@@ -13,6 +14,7 @@ class Hllc : public RiemannSolver
         void setEquationModel(std::shared_ptr<EulerEquations> euler);
 
         virtual Vector3 calculateFlux(const Vector3& wl, const Vector3& wr) const;
+        virtual std::vector<Vector3> calculateFluxes(const std::vector<Vector3>& wl, const std::vector<Vector3>& wr) const;
 
     private:
 

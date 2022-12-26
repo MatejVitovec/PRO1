@@ -87,3 +87,15 @@ Vector3 Hllc::calculateFlux(const Vector3& wl, const Vector3& wr) const
         return eulerEqn->flux(wr);
     }
 }
+
+std::vector<Vector3> Hllc::calculateFluxes(const std::vector<Vector3>& wl, const std::vector<Vector3>& wr) const
+{
+    std::vector<Vector3> out;
+
+    for (int i = 0; i < wl.size()-1; i++)
+    {
+        out.push_back(calculateFlux(wl[i+1], wr[i]));
+    }
+    
+    return out;
+}
