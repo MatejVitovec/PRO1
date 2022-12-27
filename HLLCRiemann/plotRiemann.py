@@ -1,7 +1,7 @@
 import sys
 from matplotlib import pyplot as plt
 
-#sys.argv = "", "HLLCRiemann/results/case1exact.txt", "-l", "HLLCRiemann/results/case1result.txt", "-o", "HLLCRiemann/results/case1result.png"
+sys.argv = "", "HLLCRiemann/exact.txt", "-l", "HLLCRiemann/results.txt", "-o", "HLLCRiemann/result.png"
 
 def plotMultipleCurves(x, y, plotType):
     for i in range(len(x)):

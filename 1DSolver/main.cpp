@@ -17,7 +17,20 @@
 #include "SourceTerm.hpp"
 #include "Mesh.hpp"
 
+void saveRiemann(std::string fileName, std::vector<Vector3> w, std::shared_ptr<EulerEquations> eulerEqn, std::shared_ptr<Mesh> mesh, double time)
+{
+    std::ofstream writeToFile(fileName);
+    writeToFile << mesh->getDomain() << std::endl;
+    writeToFile << mesh->getCells() << std::endl;
+    writeToFile << time << std::endl;
 
+    for (int i = 0; i < w.size(); i++)
+    {
+        writeToFile << eulerEqn->density(w[i]) << ","<< eulerEqn->velocity(w[i]) << "," << eulerEqn->pressure(w[i]) << "," << eulerEqn->internalEnergy(w[i]) << std::endl;
+    }
+        
+    writeToFile.close();
+}
 
 int main(int argc, char** argv)
 {
@@ -35,14 +48,14 @@ int main(int argc, char** argv)
     std::vector<Vector3> w;
     
 
-    Vector3 wl = eulerEqn->primitiveToConservative(Vector3({1.0, 0.75, 1.0}));
+    Vector3 wl = eulerEqn->primitiveToConservative(Vector3({1.0, 0.0, 1.0}));
     Vector3 wr = eulerEqn->primitiveToConservative(Vector3({0.125, 0, 0.1}));
     
     w = mySolver.calcRiemannInitialCondition(wl, wr);
 
-    std::vector<Vector3> wn = mySolver.solve(w, 200, 0.8);
+    std::vector<Vector3> wn = mySolver.solve(w, 500, 0.25, 0.8);
 
-    int a = 5;
+    saveRiemann("results.txt", wn, eulerEqn, mesh, 0.25);
 
     return 0;
 }

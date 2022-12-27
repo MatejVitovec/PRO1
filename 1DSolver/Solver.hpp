@@ -27,7 +27,7 @@ class Solver
         std::vector<Vector3> calcRiemannInitialCondition(Vector3 wl, Vector3 wr);
 
         std::vector<Vector3> overwriteBC(std::vector<Vector3> w, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet) const;
-        std::vector<Vector3> solve(std::vector<Vector3> w, const int& iter, const double& cfl) const;
+        std::vector<Vector3> solve(std::vector<Vector3> w, const int& iter, const double& targetTime, const double& cfl) const;
         std::vector<Vector3> solve(std::vector<Vector3> w, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl) const;
 
 
@@ -38,6 +38,7 @@ class Solver
         std::shared_ptr<TemporalScheme> temporalScheme;
 
         double timeStep(std::vector<Vector3> w, double dx, double cfl) const;
+        double timeStep(std::vector<Vector3> w, double dx, double cfl, double time, double targetTime) const;
 
 };
 

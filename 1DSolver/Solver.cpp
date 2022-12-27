@@ -85,6 +85,30 @@ double Solver::timeStep(std::vector<Vector3> w, double dx, double cfl) const
     return maxdt*cfl;
 }
 
+double Solver::timeStep(std::vector<Vector3> w, double dx, double cfl, double time, double targetTime) const
+{
+    double maxdt = 10e+100;
+
+    for (int i = 0; i < w.size(); i++)
+    {
+        //min(dt, dx/spectral radius)
+        maxdt = std::min(maxdt, dx/(fabs(eulerEqn->velocity(w[i])) + eulerEqn->soundSpeed(w[i])));
+    }
+
+    double dt = maxdt*cfl;
+      
+    if(targetTime - time < maxdt)
+    {
+        dt = targetTime - time;
+        //exitCalcualtion = true;
+    }
+    time += dt;
+
+    return dt;
+}
+
+
+
 std::vector<Vector3> Solver::overwriteBC(std::vector<Vector3> w, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet) const
 {
     w[0] = inlet->calcBoundaryState(w);    
@@ -94,19 +118,27 @@ std::vector<Vector3> Solver::overwriteBC(std::vector<Vector3> w, std::shared_ptr
 }
 
 
-std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const int& iter, const double& cfl) const
+std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const int& maxIter, const double& targetTime, const double& cfl) const
 {
     double dx = mesh->getDx();
     double t = 0;
     std::vector<Vector3> wn;
 
-    for (int i = 0; i < iter; i++)
+    int iter = 0;
+    while (iter < maxIter)
     {
-        double dt = timeStep(w, dx, cfl);
+        double dt = timeStep(w, dx, cfl, t, targetTime);
         t += dt;
 
         wn = temporalScheme->solve(w, dt, dx);
         w = wn;
+
+        if (t >= targetTime)
+        {
+            break;
+        }
+        
+        ++iter;
     }
     
     return w;

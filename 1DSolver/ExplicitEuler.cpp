@@ -25,7 +25,7 @@ std::vector<Vector3> ExplicitEuler::solve(const std::vector<Vector3>& w, double 
 
     for (int i = 1; i < w.size()-1; i++)
     {
-        wn.push_back(w[i] - dt*(res[i] + sourceRes[i]));
+        wn.push_back(w[i] + dt*(res[i] + sourceRes[i]));
     }
     
     wn.push_back(w[w.size()-1]);
