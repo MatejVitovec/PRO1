@@ -4,8 +4,6 @@
 #include <memory>
 #include <vector>
 #include "Vector3.hpp"
-#include "EulerEquations.hpp"
-#include "RiemannSolver.hpp"
 
 class SpatialScheme
 {

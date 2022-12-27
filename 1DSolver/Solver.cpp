@@ -97,12 +97,16 @@ std::vector<Vector3> Solver::overwriteBC(std::vector<Vector3> w, std::shared_ptr
 std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const int& iter, const double& cfl) const
 {
     double dx = mesh->getDx();
+    double t = 0;
+    std::vector<Vector3> wn;
 
     for (int i = 0; i < iter; i++)
     {
         double dt = timeStep(w, dx, cfl);
+        t += dt;
 
-        std::vector<Vector3> wn = temporalScheme->solve(w, dt, dx);
+        wn = temporalScheme->solve(w, dt, dx);
+        w = wn;
     }
     
     return w;

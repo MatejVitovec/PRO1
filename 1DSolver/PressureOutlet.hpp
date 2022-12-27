@@ -2,7 +2,7 @@
 #define PRESSUREOUTLET_H
 
 #include "Vector3.hpp"
-#include "BoundaryCondition.hpp"
+#include "EulerEquations.hpp"
 
 class PressureOutlet : public BoundaryCondition
 {

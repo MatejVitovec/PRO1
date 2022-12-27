@@ -4,25 +4,21 @@
 #include <vector>
 #include <memory>
 #include "Vector3.hpp"
-#include "EulerEquations.hpp"
-#include "SpatialScheme.hpp"
-#include "TemporalScheme.hpp"
-
 
 class Mesh
 {
     public:
         Mesh();
-        Mesh(double dom, double nCells, double startPos);
+        Mesh(double dom, int nCells, double startPos);
         
         double getDx();
-        double getCells();
+        int getCells();
         double getDomain();
         double getFirstX();
 
     protected:
         double dx;
-        double cells;
+        int cells;
         double domain;
         double firstX;
 

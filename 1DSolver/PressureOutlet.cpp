@@ -1,4 +1,5 @@
 #include <cmath>
+#include "BoundaryCondition.hpp"
 #include "PressureOutlet.hpp"
 
 

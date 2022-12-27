@@ -7,7 +7,7 @@ Mesh::Mesh()
     
 }
 
-Mesh::Mesh(double dom, double nCells, double startPos)
+Mesh::Mesh(double dom, int nCells, double startPos)
 {
     domain = dom;
     cells = nCells;
@@ -20,7 +20,7 @@ double Mesh::getDx()
     return dx;
 }
 
-double Mesh::getCells()
+int Mesh::getCells()
 {
     return cells;
 }
