@@ -34,6 +34,44 @@ void Solver::setTemporalScheme(std::shared_ptr<TemporalScheme> tmpScheme)
     Solver::temporalScheme = tmpScheme;
 }
 
+std::vector<Vector3> Solver::calcInitialCondition(Vector3 wInit, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet)
+{
+    std::vector<Vector3> w;
+
+    for (int i = 0; i < mesh->getCells()+2; i++)
+    {
+        w.push_back(wInit);
+    }
+
+    w = overwriteBC(w, inlet, outlet);
+
+    return w;
+}
+
+std::vector<Vector3> Solver::calcRiemannInitialCondition(Vector3 wl, Vector3 wr)
+{
+    std::vector<Vector3> out;
+
+    double firstX = mesh->getFirstX();
+    double dx = mesh->getDx();
+    double initDiscontinuityPos = firstX + (mesh->getDomain()/2.0);
+
+    for (int i = 0; i < mesh->getCells(); i++)
+    {
+        double x = firstX + i*dx;
+        if (x < initDiscontinuityPos)
+        {
+            out.push_back(wl);
+        }
+        else
+        {
+            out.push_back(wr);
+        }
+    }
+
+    return out;
+}
+
 double Solver::timeStep(std::vector<Vector3> w, double dx, double cfl) const
 {
     double maxdt = 10e+100;
@@ -55,22 +93,33 @@ std::vector<Vector3> Solver::overwriteBC(std::vector<Vector3> w, std::shared_ptr
     return w;
 }
 
-std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl) const
-{
 
-    //nutne pred prvni iteraci
-    w = overwriteBC(w, inlet, outlet);
+std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const int& iter, const double& cfl) const
+{
+    double dx = mesh->getDx();
 
     for (int i = 0; i < iter; i++)
     {
-        double dx = mesh->getDx();
+        double dt = timeStep(w, dx, cfl);
+
+        std::vector<Vector3> wn = temporalScheme->solve(w, dt, dx);
+    }
+    
+    return w;
+}
+
+
+std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl) const
+{
+    double dx = mesh->getDx();
+
+    for (int i = 0; i < iter; i++)
+    {
         double dt = timeStep(w, dx, cfl);
 
         std::vector<Vector3> wn = temporalScheme->solve(w, dt, dx);
         
         w = overwriteBC(wn, inlet, outlet);
-
-        //save()
     }
     
     return w;
