@@ -10,8 +10,8 @@ class ExplicitEuler : public TemporalScheme
         ExplicitEuler();
         ExplicitEuler(std::shared_ptr<SpatialScheme> spaceScheme);
 
-        virtual std::vector<Vector3> solve(const std::vector<Vector3>& w, double dt, double dx) const;
-        virtual std::vector<Vector3> solve(const std::vector<Vector3>& w, std::shared_ptr<SourceTerm> sourceTerm, double dt, double dx) const;
+        virtual std::vector<Vector3> solve(const std::vector<Vector3>& w, const double& dt, const double& dx) const;
+        virtual std::vector<Vector3> solve(const std::vector<Vector3>& w, const std::shared_ptr<SourceTerm>& sourceTerm, const double& dt, const double& dx) const;
 
     private:
 
