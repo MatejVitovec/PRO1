@@ -1,7 +1,7 @@
 import sys
 from matplotlib import pyplot as plt
 
-sys.argv = "", "PostProcess/exact.txt", "-l", "PostProcess/results.txt", "-o", "PostProcess/resultMuscl.png"
+sys.argv = "", "PostProcess/exact.txt", "-l", "PostProcess/results.txt", "-o", "PostProcess/result.png"
 
 def plotMultipleCurves(x, y, plotType):
     for i in range(len(x)):

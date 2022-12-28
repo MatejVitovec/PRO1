@@ -10,6 +10,8 @@
 #include "Solver.hpp"
 #include "SlopeLimiter.hpp"
 #include "VanAlbada.hpp"
+#include "Superbee.hpp"
+#include "Minmod.hpp"
 #include "SpatialScheme.hpp"
 #include "Godunov.hpp"
 #include "Muscl.hpp"
@@ -17,6 +19,7 @@
 #include "Hllc.hpp"
 #include "TemporalScheme.hpp"
 #include "ExplicitEuler.hpp"
+#include "ExplicitRK2.hpp"
 //#include "SourceTerm.hpp"
 #include "Mesh.hpp"
 
@@ -41,9 +44,9 @@ int main(int argc, char** argv)
 
     std::shared_ptr<EulerEquations> eulerEqn = std::make_shared<EulerEquations>(1.4, 286);
     std::shared_ptr<RiemannSolver> riemannSolver = std::make_shared<Hllc>(eulerEqn);
-    std::shared_ptr<SlopeLimiter> limiter = std::make_shared<VanAlbada>();
+    std::shared_ptr<SlopeLimiter> limiter = std::make_shared<Minmod>();
     std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Muscl>(riemannSolver, limiter);
-    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitEuler>(spcScheme);
+    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitRK2>(spcScheme);
 
     Solver mySolver = Solver(eulerEqn, mesh, spcScheme, tmpScheme);
 
@@ -55,7 +58,7 @@ int main(int argc, char** argv)
     
     w = mySolver.calcRiemannInitialCondition(wl, wr);
 
-    std::vector<Vector3> wn = mySolver.solve(w, 500, 0.25, 0.4);
+    std::vector<Vector3> wn = mySolver.solve(w, 500, 0.25, 0.9);
 
     saveRiemann("results.txt", wn, eulerEqn, mesh, 0.25);
 

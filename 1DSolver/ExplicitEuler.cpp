@@ -7,7 +7,7 @@ ExplicitEuler::ExplicitEuler()
 {
 
 }
-//std::shared_ptr<SourceTerm>
+
 ExplicitEuler::ExplicitEuler(std::shared_ptr<SpatialScheme> spaceScheme)
 {
     setSpatialScheme(spaceScheme);
