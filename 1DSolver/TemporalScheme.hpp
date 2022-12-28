@@ -12,12 +12,11 @@ class TemporalScheme
 {
     public:
         virtual std::vector<Vector3> solve(const std::vector<Vector3>& w, double dt, double dx) const = 0;
+        virtual std::vector<Vector3> solve(const std::vector<Vector3>& w, std::shared_ptr<SourceTerm> sourceTerm, double dt, double dx) const = 0;
         void setSpatialScheme(std::shared_ptr<SpatialScheme> spcScheme);
-        void setSourceTerm(std::shared_ptr<SourceTerm> srcTerm);
 
     protected:
         std::shared_ptr<SpatialScheme> spaceScheme;
-        std::shared_ptr<SourceTerm> sourceTerm;
 
 
 };

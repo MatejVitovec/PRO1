@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iostream>
 #include "Solver.hpp"
 
 Solver::Solver()
@@ -140,12 +141,14 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const int& maxIter, c
         
         ++iter;
     }
+
+    std::cout << "vypocet probehl uspesne s " << iter << " iteracemi\n";
     
     return w;
 }
 
 
-std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl) const
+std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<SourceTerm> srcTerm, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl) const
 {
     double dx = mesh->getDx();
 
@@ -153,7 +156,7 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<Bound
     {
         double dt = timeStep(w, dx, cfl);
 
-        std::vector<Vector3> wn = temporalScheme->solve(w, dt, dx);
+        std::vector<Vector3> wn = temporalScheme->solve(w, srcTerm, dt, dx);
         
         w = overwriteBC(wn, inlet, outlet);
     }

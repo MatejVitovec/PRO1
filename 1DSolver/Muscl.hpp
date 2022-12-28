@@ -1,6 +1,7 @@
 #ifndef MUSCL_H
 #define MUSCL_H
 
+#include <vector>
 #include "Vector3.hpp"
 #include "EulerEquations.hpp"
 #include "RiemannSolver.hpp"
@@ -15,7 +16,7 @@ class Muscl : public SpatialScheme
         void setRiemannSolver(std::shared_ptr<RiemannSolver> riemann);
         void setLimiter(std::shared_ptr<SlopeLimiter> limiter);
 
-        virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3> w, double dx) const;
+        virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3>& w, double dx) const;
 
     private:
         double dx;

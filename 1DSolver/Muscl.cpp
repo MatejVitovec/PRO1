@@ -1,4 +1,3 @@
-#include <vector>
 #include <cmath>
 #include "SpatialScheme.hpp"
 #include "Muscl.hpp"
@@ -29,9 +28,32 @@ Vector3 Muscl::r(const Vector3& wl, const Vector3& wc, const Vector3& wr) const
 {
     Vector3 out;
 
-    out[0] = (wc[0] - wl[0])/(wr[0] - wc[0]);
-    out[1] = (wc[1] - wl[1])/(wr[1] - wc[1]);
-    out[1] = (wc[2] - wl[2])/(wr[2] - wc[2]);
+    if((wc[0] - wl[0]) == 0.0)
+    {
+        out[0] = 0;
+    }
+    else
+    {
+        out[0] = (wc[0] - wl[0])/(wr[0] - wc[0]);
+    }
+
+    if((wc[1] - wl[1]) == 0.0)
+    {
+        out[1] = 0;
+    }
+    else
+    {
+        out[1] = (wc[1] - wl[1])/(wr[1] - wc[1]);
+    }
+
+    if((wc[2] - wl[2]) == 0.0)
+    {
+        out[2] = 0;
+    }
+    else
+    {
+        out[2] = (wc[2] - wl[2])/(wr[2] - wc[2]);
+    }
 
     return out;
 }
@@ -60,21 +82,6 @@ std::vector<Vector3> Muscl::calcLimitedSlopes(const std::vector<Vector3>& w) con
 std::vector<Vector3> Muscl::calcLStates(const std::vector<Vector3>& w, const std::vector<Vector3>& slopes) const
 {
     std::vector<Vector3> out;
-    out.push_back(w[0]);
-    out.push_back(w[1]);
-
-    for (int i = 2; i < w.size(); i++)
-    {
-        out.push_back(w[i] - 0.5*slopes[i]);
-    }
-    
-    return out;
-}
-
-
-std::vector<Vector3> Muscl::calcRStates(const std::vector<Vector3>& w, const std::vector<Vector3>& slopes) const
-{
-    std::vector<Vector3> out;
     int n = w.size();
 
     for (int i = 0; i < n-2; i++)
@@ -88,7 +95,22 @@ std::vector<Vector3> Muscl::calcRStates(const std::vector<Vector3>& w, const std
 }
 
 
-std::vector<Vector3> Muscl::calculateResidues(const std::vector<Vector3> w, double dx) const
+std::vector<Vector3> Muscl::calcRStates(const std::vector<Vector3>& w, const std::vector<Vector3>& slopes) const
+{
+    std::vector<Vector3> out;
+    out.push_back(w[0]);
+    out.push_back(w[1]);
+
+    for (int i = 2; i < w.size(); i++)
+    {
+        out.push_back(w[i] - 0.5*slopes[i]);
+    }
+    
+    return out;
+}
+
+
+std::vector<Vector3> Muscl::calculateResidues(const std::vector<Vector3>& w, double dx) const
 {
     std::vector<Vector3> res;
 
@@ -102,7 +124,7 @@ std::vector<Vector3> Muscl::calculateResidues(const std::vector<Vector3> w, doub
 
     for (int i = 0; i < w.size()-2; i++)
     {
-        res.push_back((f[i] - f[i+1])/(Muscl::dx));
+        res.push_back((f[i] - f[i+1])/dx);
     }
     
     res.push_back(Vector3({0.0, 0.0, 0.0})); // outlet void cell

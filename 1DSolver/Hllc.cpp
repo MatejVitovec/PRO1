@@ -92,9 +92,9 @@ std::vector<Vector3> Hllc::calculateFluxes(const std::vector<Vector3>& wl, const
 {
     std::vector<Vector3> out;
 
-    for (int i = 0; i < wl.size()-1; i++)
+    for (int i = 0; i < wr.size()-1; i++)
     {
-        out.push_back(calculateFlux(wr[i], wl[i+1]));
+        out.push_back(calculateFlux(wl[i], wr[i+1]));
     }
     
     return out;

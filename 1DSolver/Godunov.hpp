@@ -5,7 +5,6 @@
 #include "Vector3.hpp"
 #include "EulerEquations.hpp"
 #include "RiemannSolver.hpp"
-#include "Mesh.hpp"
 
 class Godunov : public SpatialScheme
 {
