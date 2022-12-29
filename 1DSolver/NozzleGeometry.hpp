@@ -6,10 +6,11 @@
 #include "Vector3.hpp"
 #include "Mesh.hpp"
 
-class NozzleGeometry : Mesh
+class NozzleGeometry : public Mesh
 {
     public:
         NozzleGeometry();
+        NozzleGeometry(std::string fileName);
 
         void loadGeometry(std::string fileName);
         void createGeometry();

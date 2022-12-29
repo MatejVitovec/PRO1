@@ -5,7 +5,16 @@
 
 NozzleGeometry::NozzleGeometry()
 {
+    createGeometry();
+    calcAreaDiff();
+    calcAreaDiffDividedByArea();
+}
 
+NozzleGeometry::NozzleGeometry(std::string fileName)
+{
+    loadGeometry(fileName);
+    calcAreaDiff();
+    calcAreaDiffDividedByArea();
 }
 
 

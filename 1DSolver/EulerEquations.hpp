@@ -24,6 +24,7 @@ class EulerEquations
         double soundSpeed(const Vector3& w) const;
         Vector3 flux(const Vector3& w) const;
         Vector3 primitiveToConservative(const Vector3& v) const;
+        Vector3 tempVeloPressToConservative(const Vector3& in) const;
 
     protected:
 

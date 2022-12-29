@@ -82,7 +82,7 @@ Vector3 EulerEquations::primitiveToConservative(const Vector3& v) const
     return Vector3({v[0], v[0]*v[1], 0.5*v[0]*v[1]*v[1] + (v[2])/(GAMMA - 1)});
 }
 
-/*Vector3 EulerEquations::tempVeloPressToConservative(Vector3 in)
+Vector3 EulerEquations::tempVeloPressToConservative(const Vector3& in) const
 {
     Vector3 w;
 
@@ -91,4 +91,4 @@ Vector3 EulerEquations::primitiveToConservative(const Vector3& v) const
     w[2] = in[2]/(GAMMA - 1);
 
     return w;
-}*/
+}

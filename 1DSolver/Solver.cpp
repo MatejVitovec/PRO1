@@ -161,5 +161,7 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<Sourc
         w = overwriteBC(wn, inlet, outlet);
     }
     
+    std::cout << "vypocet probehl uspesne s " << iter << " iteracemi\n";
+
     return w;
 }
