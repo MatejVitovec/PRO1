@@ -1,8 +1,8 @@
 import sys
 from matplotlib import pyplot as plt
 
-inputFileName = "ExactRiemann/results/result.txt"
-outputFileName = "ExactRiemann/results/result.png"
+inputFileName = "ExactRiemann/results/sod2.txt"
+outputFileName = "ExactRiemann/results/sod2.png"
 
 if len(sys.argv) == 3:
     inputFileName = sys.argv[1]
