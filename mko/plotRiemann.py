@@ -1,16 +1,17 @@
 import sys
 from matplotlib import pyplot as plt
 
-#sys.argv = "", "mko/results/sod2Exact.txt", "-l", "mko/results/sod2HLL.txt", "-o", "mko/results/sod2.png"
+sys.argv = "", "mko/results/sod2Exact.txt", "k-", "mko/results/sod2HLL.txt", "g-o", "mko/results/sod2muscl.txt", "r-o", "mko/results/sod2muscl.png"
 
 def plotMultipleCurves(x, y, plotType):
     for i in range(len(x)):
-        plotStyle = "k."
+#        plotStyle = "k."
 
-        if (plotType[i] == "-l"):
-            plotStyle = "k-"
+#        if (plotType[i] == "-l"):
+#           plotStyle = "k-"
+        plotStyle = plotType[i]
 
-        plt.plot(x[i], y[i], plotStyle)
+        plt.plot(x[i], y[i], plotStyle, markersize = 3)
     a = 5
 
 
@@ -76,7 +77,8 @@ for t in time:
 
 outputFileName = sys.argv[inputFileNum*2 + 1]
 
-plt.figure()
+#plt.figure()
+plt.figure(figsize=(8,6))
 
 plt.subplot(2,2,1)
 plotMultipleCurves(x, d, plotType)
@@ -102,7 +104,8 @@ plt.suptitle("t = " + str(time[0]))
 
 plt.tight_layout()
 
-plt.savefig(outputFileName)
+plt.savefig(outputFileName, dpi = 300)
+#plt.savefig("output.pdf")
 
 print("Byl vytvořen soubor ", outputFileName)
 

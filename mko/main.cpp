@@ -75,7 +75,7 @@ Vector3 riemannInitialCondition(double x, Vector3 wl, Vector3 wr, double initDis
 
 double maxTimeStep(const std::vector<Vector3>& w, double dx)
 {
-    double dt = 10e+100;
+    double dt = 10e+10;
 
     for (int i = 0; i < w.size(); i++)
     {
@@ -102,7 +102,26 @@ Vector3 waveSpeeds(const Vector3& wl, const Vector3& wr)
 }
 
 
-Vector3 waveSpeedsEstimate(const Vector3& wl, const Vector3& wr)
+Vector3 HLL(const Vector3& wl, const Vector3& wr)
+{
+    enum {sl, ss, sr};
+    Vector3 wSpeed = waveSpeeds(wl, wr);
+
+    if (0 <= wSpeed[sl])
+    {
+        return flux(wl);
+    }
+    else if (0 < wSpeed[sr])
+    {
+        return (wSpeed[sr]*flux(wl) - wSpeed[sl]*flux(wr) + wSpeed[sl]*wSpeed[sr]*(wr - wl)) / (wSpeed[sr] - wSpeed[sl]);
+    }
+    else
+    {
+        return flux(wr);
+    }
+}
+
+/*Vector3 waveSpeedsPVRS(const Vector3& wl, const Vector3& wr)
 {
     //PVRS
     double pl = pressure(wl);
@@ -141,33 +160,13 @@ Vector3 waveSpeedsEstimate(const Vector3& wl, const Vector3& wr)
     double ss = (pr - pl + rhol*ul*(sl - ul) - rhor*ur*(sr - ur))/(rhol*sl - rhol*ul - rhor*sr + rhor*ur);
 
     return Vector3({sl, ss, sr});
-}
+}*/
 
 
-Vector3 HLL(const Vector3& wl, const Vector3& wr)
+/*Vector3 HLLC(const Vector3& wl, const Vector3& wr)
 {
     enum {sl, ss, sr};
-    Vector3 wSpeed = waveSpeeds(wl, wr);
-
-    if (0 <= wSpeed[sl])
-    {
-        return flux(wl);
-    }
-    else if (0 < wSpeed[sr])
-    {
-        return (wSpeed[sr]*flux(wl) - wSpeed[sl]*flux(wr) + wSpeed[sl]*wSpeed[sr]*(wr - wl)) / (wSpeed[sr] - wSpeed[sl]);
-    }
-    else
-    {
-        return flux(wr);
-    }
-}
-
-
-Vector3 HLLC(const Vector3& wl, const Vector3& wr)
-{
-    enum {sl, ss, sr};
-    Vector3 wSpeed = waveSpeedsEstimate(wl, wr);
+    Vector3 wSpeed = waveSpeedsPVRS(wl, wr);
     
 
     if (0 <= wSpeed[sl])
@@ -190,7 +189,7 @@ Vector3 HLLC(const Vector3& wl, const Vector3& wr)
         //FR
         return flux(wr);
     }
-}
+}*/
 
 
 void loadData(std::string fileName, double& domlen, double& diaph, double& cells, double& lGamma, double& time, Vector3& stateL, Vector3& stateR)

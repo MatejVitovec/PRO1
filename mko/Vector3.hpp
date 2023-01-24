@@ -71,10 +71,4 @@ inline Vector3 operator/ (const Vector3& u, double a)
     return out;
 }
 
-// u . v
-inline double dot(const Vector3& u, const Vector3&v)
-{
-    return u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
-}
-
 #endif

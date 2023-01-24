@@ -62,25 +62,25 @@ void saveNozzle(std::string fileName, std::vector<Vector3> w, std::shared_ptr<Eu
 
 int main(int argc, char** argv)
 {    
-    //std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(1.0, 100, 0.0);
+    std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(1.0, 100, 0.0);
     
     //TOHLE JDE ASI UDELAT LEPE
-    std::shared_ptr<Mesh> mesh = std::make_shared<NozzleGeometry>();
-    std::shared_ptr<NozzleGeometry> geometry = std::make_shared<NozzleGeometry>();
+    //std::shared_ptr<Mesh> mesh = std::make_shared<NozzleGeometry>();
+    //std::shared_ptr<NozzleGeometry> geometry = std::make_shared<NozzleGeometry>();
 
     std::shared_ptr<EulerEquations> eulerEqn = std::make_shared<EulerEquations>(1.4, 287.05);
     std::shared_ptr<RiemannSolver> riemannSolver = std::make_shared<Hllc>(eulerEqn);
-    std::shared_ptr<SourceTerm> sourceTerm = std::make_shared<NozzleSourceTerm>(eulerEqn, geometry);
+    //std::shared_ptr<SourceTerm> sourceTerm = std::make_shared<NozzleSourceTerm>(eulerEqn, geometry);
 
-    //std::shared_ptr<SlopeLimiter> limiter = std::make_shared<MonotonizedCentral>();
-    //std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Muscl>(riemannSolver, limiter);
-    std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Godunov>(riemannSolver);
-    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitEuler>(spcScheme);
+    std::shared_ptr<SlopeLimiter> limiter = std::make_shared<VanAlbada>();
+    std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Muscl>(riemannSolver, limiter);
+    //std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Godunov>(riemannSolver);
+    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitRK2>(spcScheme);
 
-    std::shared_ptr<BoundaryCondition> inlet = std::make_shared<PressureTemperatureInlet>(100000.0, 293.15, eulerEqn);
-    std::shared_ptr<BoundaryCondition> outlet = std::make_shared<PressureOutlet>(77000.0, eulerEqn);
+    //std::shared_ptr<BoundaryCondition> inlet = std::make_shared<PressureTemperatureInlet>(100000.0, 293.15, eulerEqn);
+    //std::shared_ptr<BoundaryCondition> outlet = std::make_shared<PressureOutlet>(77000.0, eulerEqn);
 
-    Solver mySolver = Solver(eulerEqn, mesh, spcScheme, tmpScheme);
+    /*Solver mySolver = Solver(eulerEqn, mesh, spcScheme, tmpScheme);
 
     std::vector<Vector3> w;
     Vector3 init = eulerEqn->tempVeloPressToConservative(Vector3({293.15, 0.0, 100000.0}));
@@ -89,20 +89,20 @@ int main(int argc, char** argv)
 
     std::vector<Vector3> wn = mySolver.solve(w, sourceTerm, inlet, outlet, 20000, 0.8);
 
-    saveNozzle("nozzle.txt", wn, eulerEqn, mesh, 0.0);
+    saveNozzle("nozzle.txt", wn, eulerEqn, mesh, 0.0);*/
 
-    /*Solver mySolver = Solver(eulerEqn, mesh, spcScheme, tmpScheme);
+    Solver mySolver = Solver(eulerEqn, mesh, spcScheme, tmpScheme);
 
     std::vector<Vector3> w;
 
     Vector3 wl = eulerEqn->primitiveToConservative(Vector3({1.0, 0.0, 1.0}));
-    Vector3 wr = eulerEqn->primitiveToConservative(Vector3({0.125, 0, 0.1}));
+    Vector3 wr = eulerEqn->primitiveToConservative(Vector3({0.1, 0, 0.1795}));
     
     w = mySolver.calcRiemannInitialCondition(wl, wr);
 
-    std::vector<Vector3> wn = mySolver.solve(w, 500, 0.25, 0.9);
+    std::vector<Vector3> wn = mySolver.solve(w, 500, 0.2, 0.9);
 
-    saveRiemann("results.txt", wn, eulerEqn, mesh, 0.25);*/
+    saveRiemann("sod1.txt", wn, eulerEqn, mesh, 0.2);
 
     return 0;
 }
