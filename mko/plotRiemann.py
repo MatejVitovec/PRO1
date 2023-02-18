@@ -12,7 +12,8 @@ def plotMultipleCurves(x, y, plotType):
         plotStyle = plotType[i]
 
         plt.plot(x[i], y[i], plotStyle, markersize = 3)
-    a = 5
+
+
 
 
 inputFileNum = 1
