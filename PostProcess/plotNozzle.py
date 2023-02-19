@@ -1,16 +1,17 @@
 import sys
 from matplotlib import pyplot as plt
 
-sys.argv = "", "PostProcess/nozzle.txt", "-l", "PostProcess/nozzle.png"
+sys.argv = "", "PostProcess/nozzle2ord.txt", "g-", "PostProcess/nozzle.txt", "r-", "PostProcess/nozzleRes2.png"
 
 def plotMultipleCurves(x, y, plotType):
     for i in range(len(x)):
-        plotStyle = "k."
+        #plotStyle = "k."
 
-        if (plotType[i] == "-l"):
-            plotStyle = "k-"
+        #if (plotType[i] == "-l"):
+        #    plotStyle = "k-"
 
-        plt.plot(x[i], y[i], plotStyle)
+        #plt.plot(x[i], y[i], plotStyle)
+        plt.plot(x[i], y[i], plotType[i])
 
 
 inputFileNum = 1

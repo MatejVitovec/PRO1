@@ -220,8 +220,9 @@ double calcResidueDensity(const std::vector<Vector3> wn, const std::vector<Vecto
 int main(int argc, char** argv)
 {
     std::string inputGeometryName = "cases/profile.txt";
-    std::string inputConditionName = "cases/case1.txt";
-    std::string outputFileName = "results/case1.txt";
+    //std::string inputConditionName = "cases/case1.txt";
+    std::string inputConditionName = "cases/testCase.txt";
+    std::string outputFileName = "results/testCaseResult.txt";
 
     if(argc == 4)
     {
@@ -244,7 +245,8 @@ int main(int argc, char** argv)
     int n;
     double dx;
     double firstX;
-    std::vector<double> A = loadNozzleGeometry(inputGeometryName, dx, firstX, n);
+    //std::vector<double> A = loadNozzleGeometry(inputGeometryName, dx, firstX, n);
+    std::vector<double> A = loadNozzleGeometryTest(inputGeometryName, dx, firstX, n);
     std::vector<double> dA = areaDiff(A, dx);
 
 
