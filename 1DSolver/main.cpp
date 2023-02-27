@@ -44,13 +44,13 @@ void saveRiemann(std::string fileName, std::vector<Vector3> w, std::shared_ptr<E
     writeToFile.close();
 }
 
-void saveNozzle(std::string fileName, std::vector<Vector3> w, std::shared_ptr<EulerEquations> eulerEqn, std::shared_ptr<Mesh> mesh, double time)
+void saveNozzle(std::string fileName, std::vector<Vector3> w, std::shared_ptr<EulerEquations> eulerEqn, std::shared_ptr<Mesh> mesh, double iter)
 {
     std::ofstream writeToFile(fileName);
     writeToFile << mesh->getFirstX() << std::endl;
     writeToFile << mesh->getDx() << std::endl;
-    writeToFile << mesh->getCells() << std::endl;
-    writeToFile << time << std::endl;
+    writeToFile << mesh->getCells() + 2 << std::endl;
+    writeToFile << iter << std::endl;
 
     for (int i = 0; i < w.size(); i++)
     {
@@ -69,27 +69,32 @@ int main(int argc, char** argv)
     std::shared_ptr<SourceTerm> sourceTerm = std::make_shared<NozzleSourceTerm>(eulerEqn, geometry);
 
     //FVM schemes
-    std::shared_ptr<SlopeLimiter> limiter = std::make_shared<Minmod>();
+    /*std::shared_ptr<SlopeLimiter> limiter = std::make_shared<VanAlbada>();
     std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Muscl>(riemannSolver, limiter);
-    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitRK2>(spcScheme);
+    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitRK2>(spcScheme);*/
+    std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Godunov>(riemannSolver);
+    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitEuler>(spcScheme);
 
     //boundary condition
     std::shared_ptr<BoundaryCondition> inlet = std::make_shared<PressureTemperatureInlet>(100000.0, 293.15, eulerEqn);
-    std::shared_ptr<BoundaryCondition> outlet = std::make_shared<PressureOutlet>(77000.0, eulerEqn);
+    //std::shared_ptr<BoundaryCondition> outlet = std::make_shared<PressureOutlet>(77000.0, eulerEqn);
+    std::shared_ptr<BoundaryCondition> outlet = std::make_shared<PressureOutlet>(80000.0, eulerEqn);
 
     Solver mySolver = Solver(eulerEqn, geometry, spcScheme, tmpScheme);
 
     //initial condition    
-    Vector3 init = eulerEqn->tempVeloPressToConservative(Vector3({293.15, 0.0, 100000.0}));
+    //Vector3 init = eulerEqn->tempVeloPressToConservative(Vector3({293.15, 0.0, 100000.0}));
+    Vector3 init = Vector3({1.0, 0.0, 250000});
 
     std::vector<Vector3> w;
 
     //solver init
     w = mySolver.calcInitialCondition(init, inlet, outlet);
 
+    //cfl 0.8
     std::vector<Vector3> wn = mySolver.solve(w, sourceTerm, inlet, outlet, 20000, 0.8);
 
-    saveNozzle("nozzle.txt", wn, eulerEqn, geometry, 0.0);
+    saveNozzle("nozzle.txt", wn, eulerEqn, geometry, 20000);
 
     return 0;
 }

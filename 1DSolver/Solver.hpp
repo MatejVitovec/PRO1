@@ -27,8 +27,8 @@ class Solver
         std::vector<Vector3> calcRiemannInitialCondition(Vector3 wl, Vector3 wr);
 
         std::vector<Vector3> overwriteBC(std::vector<Vector3> w, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet) const;
-        std::vector<Vector3> solve(std::vector<Vector3> w, const int& iter, const double& targetTime, const double& cfl) const;
-        std::vector<Vector3> solve(std::vector<Vector3> w, std::shared_ptr<SourceTerm> srcTerm, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl) const;
+        std::vector<Vector3> solve(std::vector<Vector3> w, const int& iter, const double& targetTime, const double& cfl);
+        std::vector<Vector3> solve(std::vector<Vector3> w, std::shared_ptr<SourceTerm> srcTerm, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl);
 
 
     protected:
@@ -39,6 +39,9 @@ class Solver
 
         double timeStep(std::vector<Vector3> w, double dx, double cfl) const;
         double timeStep(std::vector<Vector3> w, double dx, double cfl, double time, double targetTime) const;
+
+        double calcDensityResidue(std::vector<Vector3> w, std::vector<Vector3> wn);
+        void saveDensityResidue(int step, std::vector<double> res, std::string fileName);
 
 };
 

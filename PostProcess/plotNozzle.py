@@ -1,16 +1,10 @@
 import sys
 from matplotlib import pyplot as plt
 
-sys.argv = "", "PostProcess/nozzle2ord.txt", "g-", "PostProcess/nozzle.txt", "r-", "PostProcess/nozzleRes2.png"
+sys.argv = "", "PostProcess/nozzle2ord.txt", "g-", "PostProcess/nozzle.txt", "r-", "PostProcess/nozzleResult.png"
 
 def plotMultipleCurves(x, y, plotType):
     for i in range(len(x)):
-        #plotStyle = "k."
-
-        #if (plotType[i] == "-l"):
-        #    plotStyle = "k-"
-
-        #plt.plot(x[i], y[i], plotStyle)
         plt.plot(x[i], y[i], plotType[i])
 
 
@@ -100,7 +94,7 @@ plotMultipleCurves(x, ma, plotType)
 plt.xlabel("Position")
 plt.ylabel("Mach number")
 
-plt.suptitle("t = " + str(time[0]))
+plt.suptitle("iter = " + str(time[0]))
 
 plt.tight_layout()
 

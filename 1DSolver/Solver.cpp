@@ -1,6 +1,8 @@
 #include <cmath>
 #include <iostream>
 #include "Solver.hpp"
+#include <iostream>
+#include <fstream>
 
 Solver::Solver()
 {
@@ -119,7 +121,7 @@ std::vector<Vector3> Solver::overwriteBC(std::vector<Vector3> w, std::shared_ptr
 }
 
 
-std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const int& maxIter, const double& targetTime, const double& cfl) const
+std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const int& maxIter, const double& targetTime, const double& cfl)
 {
     double dx = mesh->getDx();
     double t = 0;
@@ -148,20 +150,58 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const int& maxIter, c
 }
 
 
-std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<SourceTerm> srcTerm, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl) const
+std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<SourceTerm> srcTerm, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl)
 {
+    int densityResCalcStep = 1;
     double dx = mesh->getDx();
+    std::vector<double> denRes;
 
     for (int i = 0; i < iter; i++)
     {
         double dt = timeStep(w, dx, cfl);
 
         std::vector<Vector3> wn = temporalScheme->solve(w, srcTerm, dt, dx);
+
+        if(i%densityResCalcStep == 0)
+        {
+            denRes.push_back(calcDensityResidue(w, wn));
+        }
         
         w = overwriteBC(wn, inlet, outlet);
     }
+
+    saveDensityResidue(densityResCalcStep, denRes, "residue.txt");
     
     std::cout << "vypocet probehl uspesne s " << iter << " iteracemi\n";
 
     return w;
+}
+
+
+double Solver::calcDensityResidue(std::vector<Vector3> w, std::vector<Vector3> wn)
+{
+    double sumRes = 0;
+    int n = w.size() - 2;
+
+    for (int i = 1; i < n + 1; i++)
+    {
+        sumRes += pow(eulerEqn->density(w[i]) - eulerEqn->density(wn[i]), 2.0);
+    }
+
+    return sqrt(sumRes);
+}
+
+
+void Solver::saveDensityResidue(int step, std::vector<double> res, std::string fileName)
+{
+    std::ofstream of(fileName);
+
+    of << step << std::endl;
+
+    for (int i = 0; i < res.size(); i++)
+    {
+        of << res[i] << std::endl;
+    }
+
+    of.close();
 }

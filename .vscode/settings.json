@@ -68,6 +68,10 @@
         "condition_variable": "cpp",
         "mutex": "cpp",
         "semaphore": "cpp",
-        "stop_token": "cpp"
+        "stop_token": "cpp",
+        "csignal": "cpp",
+        "any": "cpp",
+        "codecvt": "cpp",
+        "future": "cpp"
     }
 }
