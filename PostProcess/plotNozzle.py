@@ -1,7 +1,7 @@
 import sys
 from matplotlib import pyplot as plt
 
-sys.argv = "", "PostProcess/nozzle2ord.txt", "g-", "PostProcess/nozzle.txt", "r-", "PostProcess/nozzleResult.png"
+sys.argv = "", "PostProcess/nozzleFine.txt", "k-", "PostProcess/nozzle2ord.txt", "g-", "PostProcess/nozzle.txt", "r-", "PostProcess/nozzleResult.png"
 
 def plotMultipleCurves(x, y, plotType):
     for i in range(len(x)):
@@ -78,23 +78,29 @@ plt.subplot(2,2,1)
 plotMultipleCurves(x, d, plotType)
 plt.xlabel("Position")
 plt.ylabel("Density")
+plt.grid()
 
 plt.subplot(2,2,2)
 plotMultipleCurves(x, u, plotType)
 plt.xlabel("Position")
 plt.ylabel("Velocity")
+plt.grid()
 
 plt.subplot(2,2,3)
 plotMultipleCurves(x, p, plotType)
 plt.xlabel("Position")
 plt.ylabel("Pressure")
+plt.grid()
 
 plt.subplot(2,2,4)
 plotMultipleCurves(x, ma, plotType)
 plt.xlabel("Position")
 plt.ylabel("Mach number")
+plt.grid()
 
 plt.suptitle("iter = " + str(time[0]))
+
+
 
 plt.tight_layout()
 

@@ -58,7 +58,7 @@ void NozzleGeometry::createGeometry()
 {
     area.clear();
       
-    cells = 50;
+    cells = 100;
     dx = 1.0/cells;
     firstX = 0.0;
 
