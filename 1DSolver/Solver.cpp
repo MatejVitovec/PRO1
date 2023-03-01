@@ -152,7 +152,6 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const int& maxIter, c
 
 std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<SourceTerm> srcTerm, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl)
 {
-    int densityResCalcStep = 1;
     double dx = mesh->getDx();
     std::vector<double> denRes;
 
@@ -162,15 +161,19 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<Sourc
 
         std::vector<Vector3> wn = temporalScheme->solve(w, srcTerm, dt, dx);
 
-        if(i%densityResCalcStep == 0)
-        {
-            denRes.push_back(calcDensityResidue(w, wn));
-        }
+
+        denRes.push_back(calcDensityResidue(w, wn, dt));
         
         w = overwriteBC(wn, inlet, outlet);
+
+        if(i%10000 == 0)
+        {
+            int a = 5;
+        }
+
     }
 
-    saveDensityResidue(densityResCalcStep, denRes, "residue.txt");
+    saveDensityResidue(1, denRes, "residue.txt");
     
     std::cout << "vypocet probehl uspesne s " << iter << " iteracemi\n";
 
@@ -178,17 +181,17 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<Sourc
 }
 
 
-double Solver::calcDensityResidue(std::vector<Vector3> w, std::vector<Vector3> wn)
+double Solver::calcDensityResidue(std::vector<Vector3> w, std::vector<Vector3> wn, double dt)
 {
     double sumRes = 0;
     int n = w.size() - 2;
 
     for (int i = 1; i < n + 1; i++)
     {
-        sumRes += pow(eulerEqn->density(w[i]) - eulerEqn->density(wn[i]), 2.0);
+        sumRes += pow((eulerEqn->density(w[i]) - eulerEqn->density(wn[i]))/dt, 2.0);
     }
 
-    return sqrt(sumRes);
+    return sqrt(sumRes/n);
 }
 
 

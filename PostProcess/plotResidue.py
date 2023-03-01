@@ -2,9 +2,12 @@ import sys
 from matplotlib import pyplot as plt
 
 inputFileName = "PostProcess/residue.txt"
-inputFileName2 = "PostProcess/residue2ord.txt"
-inputFileName3 = "PostProcess/residueFine.txt"
-outputFileName = "PostProcess/residueResult.png"
+inputFileName2 = "PostProcess/residueMinmod.txt"
+inputFileName3 = "PostProcess/residueVanAlbada.txt"
+inputFileName4 = "PostProcess/residueSuperbee.txt"
+inputFileName5 = "PostProcess/residueMC.txt"
+outputFileName = "PostProcess/residue.png"
+
 
 f = open(inputFileName, "r")
 res = []
@@ -16,6 +19,8 @@ for line in f:
 
 f.close()
 
+
+
 f = open(inputFileName2, "r")
 res2 = []
 
@@ -25,6 +30,8 @@ for line in f:
     res2.append(float(line))
 
 f.close()
+
+
 
 f = open(inputFileName3, "r")
 res3 = []
@@ -36,17 +43,43 @@ for line in f:
 
 f.close()
 
-plt.figure()
 
-plt.plot(range(0, len(res)*step, step), res, "r-")
-plt.plot(range(0, len(res2)*step2, step2), res2, "g-")
-plt.plot(range(0, len(res3)*step3, step3), res3, "k-")
+
+f = open(inputFileName4, "r")
+res4 = []
+
+step4 = int(f.readline())
+
+for line in f:
+    res4.append(float(line))
+
+f.close()
+
+f = open(inputFileName5, "r")
+res5 = []
+
+step5 = int(f.readline())
+
+for line in f:
+    res5.append(float(line))
+
+f.close()
+
+
+plt.figure(figsize=(8,6))
+
+plt.plot(range(0, len(res)*step, step), res, "r-", label="1st order")
+plt.plot(range(0, len(res2)*step2, step2), res2, "g-", label="Minmod")
+plt.plot(range(0, len(res3)*step3, step3), res3, "b-", label="VanAlbada")
+plt.plot(range(0, len(res4)*step4, step4), res4, "k-", label="Superbee")
+plt.plot(range(0, len(res5)*step5, step5), res5, "y-", label="MC")
 plt.yscale("log")
 plt.ylabel("||rho||")
 plt.xlabel("Iter")
+plt.legend()
 
 plt.tight_layout()
-plt.savefig(outputFileName)
+plt.savefig(outputFileName, dpi=200)
 
 print("Byl vytvořen soubor ", outputFileName)
 

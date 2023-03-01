@@ -1,11 +1,12 @@
 import sys
 from matplotlib import pyplot as plt
 
-sys.argv = "", "PostProcess/nozzleFine.txt", "k-", "PostProcess/nozzle2ord.txt", "g-", "PostProcess/nozzle.txt", "r-", "PostProcess/nozzleResult.png"
+sys.argv = "", "PostProcess/nozzle.txt", "r.-", "PostProcess/nozzleMinmod.txt", "g.-", "PostProcess/nozzleVanAlbada.txt", "b.-", "PostProcess/nozzleSuperbee.txt", "k.-", "PostProcess/nozzle.png"
+#sys.argv = "", "PostProcess/nozzleMinmod.txt", "r-", "PostProcess/nozzle.png"
 
 def plotMultipleCurves(x, y, plotType):
     for i in range(len(x)):
-        plt.plot(x[i], y[i], plotType[i])
+        plt.plot(x[i], y[i], plotType[i], linewidth=0.7, markersize=2.0)
 
 
 inputFileNum = 1
@@ -42,6 +43,7 @@ for i in range(0, inputFileNum):
 
     firstX[i] = float(f[i].readline())
     dx = float(f[i].readline())
+    firstX[i] = firstX[i] + dx/2.0
     cells[i] = int(f[i].readline())
     time[i] = float(f[i].readline())
     
@@ -68,11 +70,11 @@ for i in range(0, inputFileNum):
 for t in time:
     if time[0] != t:
         print("Vstupní data nemají stejný čas")
-        exit() 
+        #exit() 
 
 outputFileName = sys.argv[inputFileNum*2 + 1]
 
-plt.figure()
+plt.figure(figsize=(8,6))
 
 plt.subplot(2,2,1)
 plotMultipleCurves(x, d, plotType)
@@ -98,13 +100,13 @@ plt.xlabel("Position")
 plt.ylabel("Mach number")
 plt.grid()
 
-plt.suptitle("iter = " + str(time[0]))
+plt.suptitle("iter = " + str(time[0]) + ", cells = " + str(cells[0]))
 
 
 
 plt.tight_layout()
 
-plt.savefig(outputFileName)
+plt.savefig(outputFileName, dpi = 200)
 
 print("Byl vytvořen soubor ", outputFileName)
 

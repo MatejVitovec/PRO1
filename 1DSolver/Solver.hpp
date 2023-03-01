@@ -40,7 +40,7 @@ class Solver
         double timeStep(std::vector<Vector3> w, double dx, double cfl) const;
         double timeStep(std::vector<Vector3> w, double dx, double cfl, double time, double targetTime) const;
 
-        double calcDensityResidue(std::vector<Vector3> w, std::vector<Vector3> wn);
+        double calcDensityResidue(std::vector<Vector3> w, std::vector<Vector3> wn, double dt);
         void saveDensityResidue(int step, std::vector<double> res, std::string fileName);
 
 };
