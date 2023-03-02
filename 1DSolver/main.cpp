@@ -50,7 +50,7 @@ void saveNozzle(std::string fileName, std::vector<Vector3> w, std::shared_ptr<Eu
     std::ofstream writeToFile(fileName);
     writeToFile << mesh->getFirstX() << std::endl;
     writeToFile << mesh->getDx() << std::endl;
-    writeToFile << mesh->getCells() + 2 << std::endl;
+    writeToFile << mesh->getCells() << std::endl;
     writeToFile << iter << std::endl;
 
     for (int i = 1; i < w.size()-1; i++)
@@ -92,9 +92,9 @@ int main(int argc, char** argv)
     w = mySolver.calcInitialCondition(init, inlet, outlet);
 
     //cfl 0.8
-    std::vector<Vector3> wn = mySolver.solve(w, sourceTerm, inlet, outlet, 30000, 0.8);
+    std::vector<Vector3> wn = mySolver.solve(w, sourceTerm, inlet, outlet, 30000, 0.8, "residueMC.txt");
 
-    saveNozzle("nozzle.txt", wn, eulerEqn, geometry, 30000);
+    saveNozzle("nozzleMC.txt", wn, eulerEqn, geometry, 30000);
 
     return 0;
 }

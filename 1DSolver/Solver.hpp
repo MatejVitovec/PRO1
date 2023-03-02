@@ -28,7 +28,7 @@ class Solver
 
         std::vector<Vector3> overwriteBC(std::vector<Vector3> w, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet) const;
         std::vector<Vector3> solve(std::vector<Vector3> w, const int& iter, const double& targetTime, const double& cfl);
-        std::vector<Vector3> solve(std::vector<Vector3> w, std::shared_ptr<SourceTerm> srcTerm, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl);
+        std::vector<Vector3> solve(std::vector<Vector3> w, std::shared_ptr<SourceTerm> srcTerm, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl, const std::string& residueFile);
 
 
     protected:

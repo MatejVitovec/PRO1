@@ -150,7 +150,7 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const int& maxIter, c
 }
 
 
-std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<SourceTerm> srcTerm, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl)
+std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<SourceTerm> srcTerm, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl, const std::string& residueFile)
 {
     double dx = mesh->getDx();
     std::vector<double> denRes;
@@ -161,19 +161,12 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<Sourc
 
         std::vector<Vector3> wn = temporalScheme->solve(w, srcTerm, dt, dx);
 
-
         denRes.push_back(calcDensityResidue(w, wn, dt));
         
         w = overwriteBC(wn, inlet, outlet);
-
-        if(i%10000 == 0)
-        {
-            int a = 5;
-        }
-
     }
 
-    saveDensityResidue(1, denRes, "residue.txt");
+    saveDensityResidue(1, denRes, residueFile);
     
     std::cout << "vypocet probehl uspesne s " << iter << " iteracemi\n";
 

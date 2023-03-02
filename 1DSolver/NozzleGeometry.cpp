@@ -54,11 +54,16 @@ void NozzleGeometry::loadGeometry(std::string fileName)
     cells = area.size();
 }
 
+double NozzleGeometry::areaFunction(double x)
+{
+    return 1.0 + (x - 0.5)*(x - 0.5);
+}
+
 void NozzleGeometry::createGeometry()
 {
     area.clear();
       
-    cells = 50;
+    cells = 51;
     dx = 1.0/cells;
     firstX = 0.0;
 
@@ -66,7 +71,7 @@ void NozzleGeometry::createGeometry()
 
     for (int i = 0; i < cells; i++)
     {
-        area.push_back(1.0 + (x - 0.5)*(x - 0.5));
+        area.push_back(areaFunction(x+(dx/2.0)));
         x += dx;
     }
 }

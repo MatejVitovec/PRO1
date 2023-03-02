@@ -13,6 +13,7 @@ class NozzleGeometry : public Mesh
         NozzleGeometry(std::string fileName);
 
         void loadGeometry(std::string fileName);
+        double areaFunction(double x);
         void createGeometry();
         void calcAreaDiff();
         void calcAreaDiffDividedByArea();
