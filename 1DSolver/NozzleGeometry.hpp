@@ -13,20 +13,22 @@ class NozzleGeometry : public Mesh
         NozzleGeometry(std::string fileName);
 
         void loadGeometry(std::string fileName);
+        void calcAreaFaces();
+
         double areaFunction(double x);
         void createGeometry();
+
         void calcAreaDiff();
-        void calcAreaDiffDividedByArea();
 
         std::vector<double> getArea();
+        std::vector<double> getAreaFaces();
         std::vector<double> getAreaDiff();
-        std::vector<double> getAreaDiffDividedByArea();
         
 
     private:
         std::vector<double> area;
+        std::vector<double> areaFaces;
         std::vector<double> areaDiff;
-        std::vector<double> areaDiffDividedByArea;
 
 };
 

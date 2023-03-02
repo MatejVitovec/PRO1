@@ -20,7 +20,7 @@ class Mesh
         double dx;
         int cells;
         double domain;
-        double firstX;
+        double firstFaceX;
 
 };
 

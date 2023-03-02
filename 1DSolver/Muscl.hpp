@@ -12,11 +12,13 @@ class Muscl : public SpatialScheme
     public:
         Muscl();
         Muscl(std::shared_ptr<RiemannSolver> riemann, std::shared_ptr<SlopeLimiter> limiter);
+        Muscl(std::shared_ptr<RiemannSolver> riemann, std::shared_ptr<SlopeLimiter> limiter, std::shared_ptr<EulerEquations> equationModel);
         
         void setRiemannSolver(std::shared_ptr<RiemannSolver> riemann);
         void setLimiter(std::shared_ptr<SlopeLimiter> limiter);
 
         virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3>& w, double dx) const;
+        virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3>& w, std::shared_ptr<NozzleGeometry> geometry) const;
 
     private:
         double dx;

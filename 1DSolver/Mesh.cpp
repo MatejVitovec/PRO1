@@ -12,7 +12,7 @@ Mesh::Mesh(double dom, int nCells, double startPos)
     domain = dom;
     cells = nCells;
     dx = dom/cells;
-    firstX = startPos;
+    firstFaceX = startPos;
 }
 
 double Mesh::getDx()
@@ -32,5 +32,5 @@ double Mesh::getDomain()
 
 double Mesh::getFirstX()
 {
-    return firstX;
+    return firstFaceX;
 }

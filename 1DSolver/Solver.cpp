@@ -150,7 +150,7 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const int& maxIter, c
 }
 
 
-std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<SourceTerm> srcTerm, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl, const std::string& residueFile)
+std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<NozzleGeometry> geometry, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl, const std::string& residueFile)
 {
     double dx = mesh->getDx();
     std::vector<double> denRes;
@@ -159,7 +159,7 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<Sourc
     {
         double dt = timeStep(w, dx, cfl);
 
-        std::vector<Vector3> wn = temporalScheme->solve(w, srcTerm, dt, dx);
+        std::vector<Vector3> wn = temporalScheme->solve(w, dt, geometry);
 
         denRes.push_back(calcDensityResidue(w, wn, dt));
         

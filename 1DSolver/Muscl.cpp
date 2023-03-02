@@ -7,10 +7,11 @@ Muscl::Muscl()
 
 }
 
-Muscl::Muscl( std::shared_ptr<RiemannSolver> riemann, std::shared_ptr<SlopeLimiter> limiter)
+Muscl::Muscl( std::shared_ptr<RiemannSolver> riemann, std::shared_ptr<SlopeLimiter> limiter, std::shared_ptr<EulerEquations> equationModel)
 {
     setRiemannSolver(riemann);
     setLimiter(limiter);
+    setEquationModel(equationModel);
 }
 
 void Muscl::setRiemannSolver(std::shared_ptr<RiemannSolver> riemann)
@@ -125,6 +126,33 @@ std::vector<Vector3> Muscl::calculateResidues(const std::vector<Vector3>& w, dou
     for (int i = 0; i < w.size()-2; i++)
     {
         res.push_back((f[i] - f[i+1])/dx);
+    }
+    
+    res.push_back(Vector3({0.0, 0.0, 0.0})); // outlet void cell
+
+    return res;
+}
+
+std::vector<Vector3> Muscl::calculateResidues(const std::vector<Vector3>& w, std::shared_ptr<NozzleGeometry> geometry) const
+{
+    double dx = geometry->getDx();
+    std::vector<double> area = geometry->getArea();
+    std::vector<double> areaFaces = geometry->getAreaFaces();
+    std::vector<double> areaDiff = geometry->getAreaDiff();
+
+    std::vector<Vector3> res;
+
+    std::vector<Vector3> slopes = calcLimitedSlopes(w);
+    std::vector<Vector3> wl = calcLStates(w, slopes);
+    std::vector<Vector3> wr = calcRStates(w, slopes);
+
+    std::vector<Vector3> f = riemannSolver->calculateFluxes(wl, wr);
+
+    res.push_back(Vector3({0.0, 0.0, 0.0})); // inlet void cell
+
+    for (int i = 0; i < w.size()-2; i++)
+    {
+        res.push_back(((areaFaces[i]*f[i] - areaFaces[i+1]*f[i+1])/dx + Vector3({0.0, (eulerEqn->pressure(w[i+1]))*areaDiff[i], 0.0}))/area[i]);
     }
     
     res.push_back(Vector3({0.0, 0.0, 0.0})); // outlet void cell

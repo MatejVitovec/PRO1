@@ -7,14 +7,13 @@ NozzleGeometry::NozzleGeometry()
 {
     createGeometry();
     calcAreaDiff();
-    calcAreaDiffDividedByArea();
 }
 
 NozzleGeometry::NozzleGeometry(std::string fileName)
 {
     loadGeometry(fileName);
+    calcAreaFaces();
     calcAreaDiff();
-    calcAreaDiffDividedByArea();
 }
 
 
@@ -28,14 +27,14 @@ void NozzleGeometry::loadGeometry(std::string fileName)
     double lastX;
 
     inFile >> xx >> yy;
-    firstX = std::stod(xx);
+    firstFaceX = std::stod(xx);
     area.push_back(std::stod(yy));
 
     inFile >> xx >> yy;
     lastX = std::stod(xx);
     area.push_back(std::stod(yy));
 
-    dx = fabs(fabs(lastX) - fabs(firstX));
+    dx = fabs(fabs(lastX) - fabs(firstFaceX));
 
     while (inFile >> xx >> yy)
     {
@@ -54,6 +53,11 @@ void NozzleGeometry::loadGeometry(std::string fileName)
     cells = area.size();
 }
 
+void NozzleGeometry::calcAreaFaces()
+{
+    //todo
+}
+
 double NozzleGeometry::areaFunction(double x)
 {
     return 1.0 + (x - 0.5)*(x - 0.5);
@@ -62,21 +66,22 @@ double NozzleGeometry::areaFunction(double x)
 void NozzleGeometry::createGeometry()
 {
     area.clear();
+    areaFaces.clear();
       
-    cells = 51;
+    cells = 50;
     dx = 1.0/cells;
-    firstX = 0.0;
+    firstFaceX = 0.0;
 
-    double x = firstX;
+    areaFaces.push_back(areaFunction(firstFaceX));
 
     for (int i = 0; i < cells; i++)
     {
-        area.push_back(areaFunction(x+(dx/2.0)));
-        x += dx;
+        area.push_back(areaFunction(firstFaceX + i*dx + dx/2.0));
+        areaFaces.push_back(areaFunction(firstFaceX + (i+1)*dx));
     }
 }
 
-void NozzleGeometry::calcAreaDiff()
+/*void NozzleGeometry::calcAreaDiff()
 {
     areaDiff.clear();
 
@@ -89,16 +94,16 @@ void NozzleGeometry::calcAreaDiff()
     }
     
     areaDiff.push_back((area[vectorSize - 1] - area[vectorSize - 2])/dx);
-}
+}*/
 
-void NozzleGeometry::calcAreaDiffDividedByArea()
+void NozzleGeometry::calcAreaDiff()
 {
-    areaDiffDividedByArea.clear();
+    areaDiff.clear();
 
     for (int i = 0; i < area.size(); i++)
     {
-        areaDiffDividedByArea.push_back(areaDiff[i]/area[i]);
-    }    
+        areaDiff.push_back((areaFaces[i+1] - areaFaces[i])/(dx));
+    }
 }
 
 std::vector<double> NozzleGeometry::getArea()
@@ -106,12 +111,12 @@ std::vector<double> NozzleGeometry::getArea()
     return area;
 }
 
+std::vector<double> NozzleGeometry::getAreaFaces()
+{
+    return areaFaces;
+}
+
 std::vector<double> NozzleGeometry::getAreaDiff()
 {
     return areaDiff;
-}
-
-std::vector<double> NozzleGeometry::getAreaDiffDividedByArea()
-{
-    return areaDiffDividedByArea;
 }
