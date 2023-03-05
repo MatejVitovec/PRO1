@@ -62,7 +62,7 @@ Vector3 Muscl::r(const Vector3& wl, const Vector3& wc, const Vector3& wr) const
 
 std::vector<Vector3> Muscl::calcLimitedSlopes(const std::vector<Vector3>& w) const
 {
-    std::vector<Vector3> out;
+    /*std::vector<Vector3> out;
 
     out.push_back(Vector3({0.0, 0.0, 0.0}));
 
@@ -74,6 +74,23 @@ std::vector<Vector3> Muscl::calcLimitedSlopes(const std::vector<Vector3>& w) con
         out.push_back(lim*(w[i+1] - w[i]));
     }
 
+    out.push_back(Vector3({0.0, 0.0, 0.0}));*/
+
+    std::vector<Vector3> out;
+    int n = w.size();
+
+    out.push_back(Vector3({0.0, 0.0, 0.0}));
+    out.push_back(w[3] - w[2]);
+
+    for (int i = 2; i < w.size()-2; i++)
+    {
+        Vector3 lim = limiter->calc(r(w[i-1], w[i], w[i+1]));
+
+        //(omega = -1)
+        out.push_back(lim*(w[i+1] - w[i]));
+    }
+
+    out.push_back(w[n - 2] - w[n - 3]);
     out.push_back(Vector3({0.0, 0.0, 0.0}));
     
     return out;
@@ -83,14 +100,11 @@ std::vector<Vector3> Muscl::calcLimitedSlopes(const std::vector<Vector3>& w) con
 std::vector<Vector3> Muscl::calcLStates(const std::vector<Vector3>& w, const std::vector<Vector3>& slopes) const
 {
     std::vector<Vector3> out;
-    int n = w.size();
 
-    for (int i = 0; i < n-2; i++)
+    for (int i = 0; i < w.size(); i++)
     {
         out.push_back(w[i] + 0.5*slopes[i]);
     }
-    out.push_back(w[n-2]);
-    out.push_back(w[n-1]);
     
     return out;
 }
@@ -99,10 +113,8 @@ std::vector<Vector3> Muscl::calcLStates(const std::vector<Vector3>& w, const std
 std::vector<Vector3> Muscl::calcRStates(const std::vector<Vector3>& w, const std::vector<Vector3>& slopes) const
 {
     std::vector<Vector3> out;
-    out.push_back(w[0]);
-    out.push_back(w[1]);
 
-    for (int i = 2; i < w.size(); i++)
+    for (int i = 0; i < w.size(); i++)
     {
         out.push_back(w[i] - 0.5*slopes[i]);
     }
@@ -148,14 +160,14 @@ std::vector<Vector3> Muscl::calculateResidues(const std::vector<Vector3>& w, std
 
     std::vector<Vector3> f = riemannSolver->calculateFluxes(wl, wr);
 
-    res.push_back(Vector3({0.0, 0.0, 0.0})); // inlet void cell
+    res.push_back(Vector3({0.0, 0.0, 0.0})); // inlet void cell residue
 
     for (int i = 0; i < w.size()-2; i++)
     {
         res.push_back(((areaFaces[i]*f[i] - areaFaces[i+1]*f[i+1])/dx + Vector3({0.0, (eulerEqn->pressure(w[i+1]))*areaDiff[i], 0.0}))/area[i]);
     }
     
-    res.push_back(Vector3({0.0, 0.0, 0.0})); // outlet void cell
+    res.push_back(Vector3({0.0, 0.0, 0.0})); // outlet void cell residue
 
     return res;
 }

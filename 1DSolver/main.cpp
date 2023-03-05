@@ -18,6 +18,7 @@
 #include "Muscl.hpp"
 #include "RiemannSolver.hpp"
 #include "Hllc.hpp"
+#include "Hll.hpp"
 #include "TemporalScheme.hpp"
 #include "ExplicitEuler.hpp"
 #include "ExplicitRK2.hpp"
@@ -64,17 +65,16 @@ int main(int argc, char** argv)
     std::shared_ptr<NozzleGeometry> geometry = std::make_shared<NozzleGeometry>();
 
     std::shared_ptr<EulerEquations> eulerEqn = std::make_shared<EulerEquations>(1.4, 287.05);
-    std::shared_ptr<RiemannSolver> riemannSolver = std::make_shared<Hllc>(eulerEqn);
+    std::shared_ptr<RiemannSolver> riemannSolver = std::make_shared<Hll>(eulerEqn);
 
     //FVM schemes
-    std::shared_ptr<SlopeLimiter> limiter = std::make_shared<Superbee>();
+    std::shared_ptr<SlopeLimiter> limiter = std::make_shared<Minmod>();
     std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Muscl>(riemannSolver, limiter, eulerEqn);
     std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitRK2>(spcScheme);
     /*std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Godunov>(riemannSolver, eulerEqn);
     std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitEuler>(spcScheme);*/
 
     //boundary condition
-    //std::shared_ptr<BoundaryCondition> inlet = std::make_shared<PressureDensityInlet>(100000.0, 1.2, eulerEqn);
     std::shared_ptr<BoundaryCondition> inlet = std::make_shared<PressureDensityInlet>(100000.0, 1.2, eulerEqn);
     std::shared_ptr<BoundaryCondition> outlet = std::make_shared<PressureOutlet>(80000.0, eulerEqn);
 
@@ -90,9 +90,9 @@ int main(int argc, char** argv)
     w = mySolver.calcInitialCondition(init, inlet, outlet);
 
     //cfl 0.8
-    std::vector<Vector3> wn = mySolver.solve(w, geometry, inlet, outlet, 20000, 0.8, "residueSuperbee.txt");
+    std::vector<Vector3> wn = mySolver.solve(w, geometry, inlet, outlet, 20000, 0.8, "residueHllMinmod.txt");
 
-    saveNozzle("nozzleSuperbee.txt", wn, eulerEqn, geometry, 20000);
+    saveNozzle("nozzleHllMinmod.txt", wn, eulerEqn, geometry, 20000);
 
     return 0;
 }

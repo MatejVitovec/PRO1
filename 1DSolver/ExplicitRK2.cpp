@@ -37,7 +37,7 @@ std::vector<Vector3> ExplicitRK2::solve(const std::vector<Vector3>& w, const dou
 
 std::vector<Vector3> ExplicitRK2::solve(const std::vector<Vector3>& w, const double& dt, std::shared_ptr<NozzleGeometry> geometry) const
 {
-    std::vector<Vector3> wk;
+    /*std::vector<Vector3> wk;
     std::vector<Vector3> wn;
     
     //first stage
@@ -52,6 +52,24 @@ std::vector<Vector3> ExplicitRK2::solve(const std::vector<Vector3>& w, const dou
     for (int i = 0; i < w.size(); i++)
     {
         wn.push_back(w[i] + dt*(k2[i]));
+    }*/
+
+    std::vector<Vector3> wp;
+    std::vector<Vector3> wn;
+
+
+    //first stage
+    std::vector<Vector3> k1 = spaceScheme->calculateResidues(w, geometry);
+    for (int i = 0; i < w.size(); i++)
+    {
+        wp.push_back(w[i] + dt*(k1[i]));
+    }    
+
+    //second stage
+    std::vector<Vector3> k2 = spaceScheme->calculateResidues(wp, geometry);
+    for (int i = 0; i < w.size(); i++)
+    {
+        wn.push_back(w[i] + (dt/2.0)*(k1[i] + k2[i]));
     }
 
     return wn;

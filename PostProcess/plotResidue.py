@@ -1,11 +1,19 @@
 import sys
 from matplotlib import pyplot as plt
 
-inputFileName = "PostProcess/residue.txt"
-inputFileName2 = "PostProcess/residueMinmod.txt"
-inputFileName3 = "PostProcess/residueVanAlbada.txt"
-inputFileName4 = "PostProcess/residueSuperbee.txt"
-inputFileName5 = "PostProcess/residueMC.txt"
+inputFileName = "PostProcess/residueHll.txt"
+inputFileName2 = "PostProcess/residueHllMinmod.txt"
+
+inputFileName3 = "PostProcess/residueHll.txt"
+inputFileName4 = "PostProcess/residueMinmod.txt"
+inputFileName5 = "PostProcess/residueMinmodHll.txt"
+
+
+
+#inputFileName2 = "PostProcess/residueMinmod.txt"
+#inputFileName3 = "PostProcess/residueVanAlbada.txt"
+#inputFileName4 = "PostProcess/residueSuperbee.txt"
+#inputFileName5 = "PostProcess/residueMC.txt"
 outputFileName = "PostProcess/residue.png"
 
 
@@ -68,11 +76,11 @@ f.close()
 
 plt.figure(figsize=(8,6))
 
-plt.plot(range(0, len(res)*step, step), res, "r-", label="1st order")
-plt.plot(range(0, len(res2)*step2, step2), res2, "g-", label="Minmod")
-plt.plot(range(0, len(res3)*step3, step3), res3, "b-", label="VanAlbada")
-plt.plot(range(0, len(res4)*step4, step4), res4, "k-", label="Superbee")
-plt.plot(range(0, len(res5)*step5, step5), res5, "y-", label="MC")
+plt.plot(range(0, len(res)*step, step), res, "r-", label="Hll")
+plt.plot(range(0, len(res2)*step2, step2), res2, "g-", label="HllMinmod")
+#plt.plot(range(0, len(res3)*step3, step3), res3, "b-", label="Hll")
+#plt.plot(range(0, len(res4)*step4, step4), res4, "k-", label="Minmod")
+#plt.plot(range(0, len(res5)*step5, step5), res5, "y-", label="MinmodHll")
 plt.yscale("log")
 plt.ylabel("||rho||")
 plt.xlabel("Iter")

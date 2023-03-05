@@ -184,7 +184,8 @@ double Solver::calcDensityResidue(std::vector<Vector3> w, std::vector<Vector3> w
         sumRes += pow((eulerEqn->density(w[i]) - eulerEqn->density(wn[i]))/dt, 2.0);
     }
 
-    return sqrt(sumRes/n);
+    return sqrt(sumRes);
+    //return sqrt(sumRes/n);
 }
 
 
