@@ -29,7 +29,7 @@ Vector3 PressureTemperatureInlet::calcBoundaryState(const std::vector<Vector3>& 
     double gamma = eulerEqn->getGamma();
     double r = eulerEqn->getR();
 
-    double p = std::min(eulerEqn->pressure(w[1]), totalPressure);
+    double p = std::min(eulerEqn->pressure(w[0]), totalPressure);
     double m2 = (2.0/(gamma - 1.0))*(pow((p/totalPressure), ((1.0 - gamma)/gamma)) - 1.0);
     double temp = totalTemperature/(1.0 + ((gamma - 1.0)/2.0)*m2);
     double rho = p/(temp*r);

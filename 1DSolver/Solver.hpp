@@ -6,6 +6,7 @@
 #include "Vector3.hpp"
 #include "EulerEquations.hpp"
 #include "Mesh.hpp"
+#include "Nozzle.hpp"
 #include "SpatialScheme.hpp"
 #include "TemporalScheme.hpp"
 #include "BoundaryCondition.hpp"
@@ -23,12 +24,11 @@ class Solver
         void setSpatialScheme(std::shared_ptr<SpatialScheme> spcScheme);
         void setTemporalScheme(std::shared_ptr<TemporalScheme> tmpScheme);
 
-        std::vector<Vector3> calcInitialCondition(Vector3 wInit, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet);
+        std::vector<Vector3> calcInitialCondition(Vector3 wInit);
         std::vector<Vector3> calcRiemannInitialCondition(Vector3 wl, Vector3 wr);
 
-        std::vector<Vector3> overwriteBC(std::vector<Vector3> w, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet) const;
         std::vector<Vector3> solve(std::vector<Vector3> w, const int& iter, const double& targetTime, const double& cfl);
-        std::vector<Vector3> solve(std::vector<Vector3> w, std::shared_ptr<NozzleGeometry> srcTerm, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl, const std::string& residueFile);
+        std::vector<Vector3> solve(std::vector<Vector3> w, std::shared_ptr<Nozzle> mesh, const int& iter, const double& cfl, const std::string& residueFile);
 
 
     protected:

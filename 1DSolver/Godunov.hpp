@@ -15,7 +15,7 @@ class Godunov : public SpatialScheme
         void setRiemannSolver(std::shared_ptr<RiemannSolver> riemann);
 
         virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3>& w, double dx) const;
-        virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3>& w, std::shared_ptr<NozzleGeometry> geometry) const;
+        virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3>& w, std::shared_ptr<Nozzle> mesh) const;
 
     private:
         std::shared_ptr<RiemannSolver> riemannSolver;

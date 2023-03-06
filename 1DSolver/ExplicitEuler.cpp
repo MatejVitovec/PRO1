@@ -27,11 +27,11 @@ std::vector<Vector3> ExplicitEuler::solve(const std::vector<Vector3>& w, const d
     return wn;
 }
 
-std::vector<Vector3> ExplicitEuler::solve(const std::vector<Vector3>& w, const double& dt, std::shared_ptr<NozzleGeometry> geometry) const
+std::vector<Vector3> ExplicitEuler::solve(const std::vector<Vector3>& w, const double& dt, std::shared_ptr<Nozzle> mesh) const
 {
     std::vector<Vector3> wn;
     
-    std::vector<Vector3> res = spaceScheme->calculateResidues(w, geometry);
+    std::vector<Vector3> res = spaceScheme->calculateResidues(w, mesh);
 
     for (int i = 0; i < w.size(); i++)
     {

@@ -37,22 +37,21 @@ void Solver::setTemporalScheme(std::shared_ptr<TemporalScheme> tmpScheme)
     Solver::temporalScheme = tmpScheme;
 }
 
-std::vector<Vector3> Solver::calcInitialCondition(Vector3 wInit, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet)
+std::vector<Vector3> Solver::calcInitialCondition(Vector3 wInit)
 {
     std::vector<Vector3> w;
 
-    for (int i = 0; i < mesh->getCells()+2; i++)
+    for (int i = 0; i < mesh->getCells(); i++)
     {
         w.push_back(wInit);
     }
-
-    w = overwriteBC(w, inlet, outlet);
 
     return w;
 }
 
 std::vector<Vector3> Solver::calcRiemannInitialCondition(Vector3 wl, Vector3 wr)
 {
+    //TODO
     std::vector<Vector3> out;
 
     double firstX = mesh->getFirstX();
@@ -111,16 +110,6 @@ double Solver::timeStep(std::vector<Vector3> w, double dx, double cfl, double ti
 }
 
 
-
-std::vector<Vector3> Solver::overwriteBC(std::vector<Vector3> w, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet) const
-{
-    w[0] = inlet->calcBoundaryState(w);    
-    w[w.size()-1] = outlet->calcBoundaryState(w);
-
-    return w;
-}
-
-
 std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const int& maxIter, const double& targetTime, const double& cfl)
 {
     double dx = mesh->getDx();
@@ -150,7 +139,7 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const int& maxIter, c
 }
 
 
-std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<NozzleGeometry> geometry, std::shared_ptr<BoundaryCondition> inlet, std::shared_ptr<BoundaryCondition> outlet, const int& iter, const double& cfl, const std::string& residueFile)
+std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<Nozzle> mesh, const int& iter, const double& cfl, const std::string& residueFile)
 {
     double dx = mesh->getDx();
     std::vector<double> denRes;
@@ -159,11 +148,11 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<Nozzl
     {
         double dt = timeStep(w, dx, cfl);
 
-        std::vector<Vector3> wn = temporalScheme->solve(w, dt, geometry);
+        std::vector<Vector3> wn = temporalScheme->solve(w, dt, mesh);
 
         denRes.push_back(calcDensityResidue(w, wn, dt));
-        
-        w = overwriteBC(wn, inlet, outlet);
+
+        w = wn; //streaming
     }
 
     saveDensityResidue(1, denRes, residueFile);
@@ -177,9 +166,8 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<Nozzl
 double Solver::calcDensityResidue(std::vector<Vector3> w, std::vector<Vector3> wn, double dt)
 {
     double sumRes = 0;
-    int n = w.size() - 2;
 
-    for (int i = 1; i < n + 1; i++)
+    for (int i = 0; i < w.size(); i++)
     {
         sumRes += pow((eulerEqn->density(w[i]) - eulerEqn->density(wn[i]))/dt, 2.0);
     }

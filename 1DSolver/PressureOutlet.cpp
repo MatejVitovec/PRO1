@@ -23,9 +23,8 @@ void PressureOutlet::setPressure(double press)
 Vector3 PressureOutlet::calcBoundaryState(const std::vector<Vector3>& w) const
 {
     double gamma = eulerEqn->getGamma();
-    double r = eulerEqn->getR();
 
-    Vector3 wn = w[w.size()-2];
+    Vector3 wn = w[w.size()-1];
 
     if ((eulerEqn->velocity(wn)/eulerEqn->soundSpeed(wn)) < 1)
     {            

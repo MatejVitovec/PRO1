@@ -29,7 +29,7 @@ Vector3 PressureDensityInlet::calcBoundaryState(const std::vector<Vector3>& w) c
     double gamma = eulerEqn->getGamma();
     double r = eulerEqn->getR();
 
-    double p = std::min(eulerEqn->pressure(w[1]), totalPressure);
+    double p = std::min(eulerEqn->pressure(w[0]), totalPressure);
     double m2 = (2.0/(gamma - 1.0))*(pow((p/totalPressure), ((1.0 - gamma)/gamma)) - 1.0);
     double rho = totalDensity*pow((1.0 + ((gamma - 1.0)/2.0)*m2), (1.0/(1.0 - gamma)));
     double u = sqrt(m2*((gamma*p)/rho));

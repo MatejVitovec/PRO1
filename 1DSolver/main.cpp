@@ -21,9 +21,10 @@
 #include "Hll.hpp"
 #include "TemporalScheme.hpp"
 #include "ExplicitEuler.hpp"
+#include "ExplicitHeun.hpp"
 #include "ExplicitRK2.hpp"
 #include "Mesh.hpp"
-#include "NozzleGeometry.hpp"
+#include "Nozzle.hpp"
 #include "BoundaryCondition.hpp"
 #include "PressureTemperatureInlet.hpp"
 #include "PressureDensityInlet.hpp"
@@ -52,7 +53,7 @@ void saveNozzle(std::string fileName, std::vector<Vector3> w, std::shared_ptr<Eu
     writeToFile << mesh->getCells() << std::endl;
     writeToFile << iter << std::endl;
 
-    for (int i = 1; i < w.size()-1; i++)
+    for (int i = 0; i < w.size(); i++)
     {
         writeToFile << eulerEqn->density(w[i]) << ","<< eulerEqn->velocity(w[i]) << "," << eulerEqn->pressure(w[i]) << "," << (eulerEqn->velocity(w[i])/eulerEqn->soundSpeed(w[i])) << std::endl;
     }
@@ -62,7 +63,7 @@ void saveNozzle(std::string fileName, std::vector<Vector3> w, std::shared_ptr<Eu
 
 int main(int argc, char** argv)
 {
-    std::shared_ptr<NozzleGeometry> geometry = std::make_shared<NozzleGeometry>();
+    std::shared_ptr<Nozzle> mesh = std::make_shared<Nozzle>();
 
     std::shared_ptr<EulerEquations> eulerEqn = std::make_shared<EulerEquations>(1.4, 287.05);
     std::shared_ptr<RiemannSolver> riemannSolver = std::make_shared<Hll>(eulerEqn);
@@ -70,15 +71,16 @@ int main(int argc, char** argv)
     //FVM schemes
     std::shared_ptr<SlopeLimiter> limiter = std::make_shared<Minmod>();
     std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Muscl>(riemannSolver, limiter, eulerEqn);
-    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitRK2>(spcScheme);
+    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitHeun>(spcScheme);
     /*std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Godunov>(riemannSolver, eulerEqn);
     std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitEuler>(spcScheme);*/
 
     //boundary condition
-    std::shared_ptr<BoundaryCondition> inlet = std::make_shared<PressureDensityInlet>(100000.0, 1.2, eulerEqn);
-    std::shared_ptr<BoundaryCondition> outlet = std::make_shared<PressureOutlet>(80000.0, eulerEqn);
+    mesh->setInlet(std::make_shared<PressureDensityInlet>(100000.0, 1.2, eulerEqn));
+    mesh->setOutlet(std::make_shared<PressureOutlet>(80000.0, eulerEqn));
+    
 
-    Solver mySolver = Solver(eulerEqn, geometry, spcScheme, tmpScheme);
+    Solver mySolver = Solver(eulerEqn, mesh, spcScheme, tmpScheme);
 
     //initial condition    
     //Vector3 init = eulerEqn->tempVeloPressToConservative(Vector3({293.15, 0.0, 100000.0}));
@@ -87,12 +89,12 @@ int main(int argc, char** argv)
     std::vector<Vector3> w;
 
     //solver init
-    w = mySolver.calcInitialCondition(init, inlet, outlet);
+    w = mySolver.calcInitialCondition(init);
 
     //cfl 0.8
-    std::vector<Vector3> wn = mySolver.solve(w, geometry, inlet, outlet, 20000, 0.8, "residueHllMinmod.txt");
+    std::vector<Vector3> wn = mySolver.solve(w, mesh, 20000, 0.8, "residueMinmod.txt");
 
-    saveNozzle("nozzleHllMinmod.txt", wn, eulerEqn, geometry, 20000);
+    saveNozzle("nozzleMinmod.txt", wn, eulerEqn, mesh, 20000);
 
     return 0;
 }

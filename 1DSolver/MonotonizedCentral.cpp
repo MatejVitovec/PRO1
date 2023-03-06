@@ -29,7 +29,7 @@ Vector3 MonotonizedCentral::calc(const Vector3& r) const
     }
     else
     {
-        out[1] = std::max(0.0, std::min(2.0*r[2], std::min(0.5*(1.0 + r[2]), 2.0)));
+        out[2] = std::max(0.0, std::min(2.0*r[2], std::min(0.5*(1.0 + r[2]), 2.0)));
     }
 
     return out;

@@ -57,7 +57,7 @@ std::vector<Vector3> Hll::calculateFluxes(const std::vector<Vector3>& wl, const 
 {
     std::vector<Vector3> out;
 
-    for (int i = 0; i < wr.size()-1; i++)
+    for (int i = 0; i < wl.size()-1; i++)
     {
         out.push_back(calculateFlux(wl[i], wr[i+1]));
     }

@@ -1,6 +1,7 @@
 #include <cmath>
 #include "SpatialScheme.hpp"
 #include "Godunov.hpp"
+#include "BoundaryCondition.hpp"
 
 Godunov::Godunov()
 {
@@ -24,38 +25,40 @@ std::vector<Vector3> Godunov::calculateResidues(const std::vector<Vector3>& w, d
     std::vector<Vector3> res;
 
     std::vector<Vector3> f = riemannSolver->calculateFluxes(w, w);
+    
+    f.insert(f.begin(), riemannSolver->calculateFlux(w[0], w[0]));
+    f.push_back(riemannSolver->calculateFlux(w[w.size()-1], w[w.size()-1]));;
 
-    res.push_back(Vector3({0.0, 0.0, 0.0})); // inlet void cell residue
-
-    for (int i = 0; i < w.size()-2; i++)
+    for (int i = 0; i < w.size(); i++)
     {
         res.push_back((f[i] - f[i+1])/dx);
     }
-    
-    res.push_back(Vector3({0.0, 0.0, 0.0})); // outlet void cell residue
 
     return res;
 }
 
-std::vector<Vector3> Godunov::calculateResidues(const std::vector<Vector3>& w, std::shared_ptr<NozzleGeometry> geometry) const
+std::vector<Vector3> Godunov::calculateResidues(const std::vector<Vector3>& w, std::shared_ptr<Nozzle> nozzle) const
 {
-    double dx = geometry->getDx();
-    std::vector<double> area = geometry->getArea();
-    std::vector<double> areaFaces = geometry->getAreaFaces();
-    std::vector<double> areaDiff = geometry->getAreaDiff();
+    double dx = nozzle->getDx();
+    std::vector<double> area = nozzle->getArea();
+    std::vector<double> areaFaces = nozzle->getAreaFaces();
+    std::vector<double> areaDiff = nozzle->getAreaDiff();
+
+    std::shared_ptr<BoundaryCondition> inlet = nozzle->getInlet();
+    std::shared_ptr<BoundaryCondition> outlet = nozzle->getOutlet();
 
     std::vector<Vector3> res;
 
-    std::vector<Vector3> f = riemannSolver->calculateFluxes(w, w);
+    std::vector<Vector3> wp = w;
+    wp.insert(wp.begin(), inlet->calcBoundaryState(w));
+    wp.push_back(outlet->calcBoundaryState(w));
 
-    res.push_back(Vector3({0.0, 0.0, 0.0})); // inlet void cell residue
+    std::vector<Vector3> f = riemannSolver->calculateFluxes(wp, wp);
 
-    for (int i = 0; i < w.size()-2; i++)
+    for (int i = 0; i < w.size(); i++)
     {
-        res.push_back(((areaFaces[i]*f[i] - areaFaces[i+1]*f[i+1])/dx + Vector3({0.0, (eulerEqn->pressure(w[i+1]))*areaDiff[i], 0.0}))/area[i]);
+        res.push_back(((areaFaces[i]*f[i] - areaFaces[i+1]*f[i+1])/dx + Vector3({0.0, (eulerEqn->pressure(w[i]))*areaDiff[i], 0.0}))/area[i]);
     }
-    
-    res.push_back(Vector3({0.0, 0.0, 0.0})); // outlet void cell residue
 
     return res;
 }

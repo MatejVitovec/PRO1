@@ -1,12 +1,12 @@
 import sys
 from matplotlib import pyplot as plt
 
-inputFileName = "PostProcess/residueHll.txt"
-inputFileName2 = "PostProcess/residueHllMinmod.txt"
+inputFileName = "PostProcess/residueNew.txt"
+inputFileName2 = "PostProcess/residueMinmod.txt"
 
-inputFileName3 = "PostProcess/residueHll.txt"
-inputFileName4 = "PostProcess/residueMinmod.txt"
-inputFileName5 = "PostProcess/residueMinmodHll.txt"
+inputFileName3 = "PostProcess/residueNew.txt"
+inputFileName4 = "PostProcess/residueNew.txt"
+inputFileName5 = "PostProcess/residueNew.txt"
 
 
 
@@ -76,7 +76,7 @@ f.close()
 
 plt.figure(figsize=(8,6))
 
-plt.plot(range(0, len(res)*step, step), res, "r-", label="Hll")
+plt.plot(range(0, len(res)*step, step), res, "r-", label="New")
 plt.plot(range(0, len(res2)*step2, step2), res2, "g-", label="HllMinmod")
 #plt.plot(range(0, len(res3)*step3, step3), res3, "b-", label="Hll")
 #plt.plot(range(0, len(res4)*step4, step4), res4, "k-", label="Minmod")

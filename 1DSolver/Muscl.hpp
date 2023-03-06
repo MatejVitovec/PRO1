@@ -18,10 +18,9 @@ class Muscl : public SpatialScheme
         void setLimiter(std::shared_ptr<SlopeLimiter> limiter);
 
         virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3>& w, double dx) const;
-        virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3>& w, std::shared_ptr<NozzleGeometry> geometry) const;
+        virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3>& w, std::shared_ptr<Nozzle> nozzle) const;
 
     private:
-        double dx;
         std::shared_ptr<RiemannSolver> riemannSolver;
         std::shared_ptr<SlopeLimiter> limiter;
 
