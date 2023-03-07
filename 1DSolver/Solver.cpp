@@ -9,10 +9,9 @@ Solver::Solver()
 
 }
 
-Solver::Solver(std::shared_ptr<EulerEquations> euler, std::shared_ptr<Mesh> mesh, std::shared_ptr<SpatialScheme> spcScheme, std::shared_ptr<TemporalScheme> tmpScheme)
+Solver::Solver(std::shared_ptr<EulerEquations> euler, std::shared_ptr<SpatialScheme> spcScheme, std::shared_ptr<TemporalScheme> tmpScheme)
 {
     setEquationModel(euler);
-    setMesh(mesh);
     setSpatialScheme(spcScheme);
     setTemporalScheme(tmpScheme);
 }
@@ -20,11 +19,6 @@ Solver::Solver(std::shared_ptr<EulerEquations> euler, std::shared_ptr<Mesh> mesh
 void Solver::setEquationModel(std::shared_ptr<EulerEquations> euler)
 {
     Solver::eulerEqn = euler;
-}
-
-void Solver::setMesh(std::shared_ptr<Mesh> mesh)
-{
-    Solver::mesh = mesh;
 }
 
 void Solver::setSpatialScheme(std::shared_ptr<SpatialScheme> spcScheme)
@@ -37,7 +31,7 @@ void Solver::setTemporalScheme(std::shared_ptr<TemporalScheme> tmpScheme)
     Solver::temporalScheme = tmpScheme;
 }
 
-std::vector<Vector3> Solver::calcInitialCondition(Vector3 wInit)
+std::vector<Vector3> Solver::calcInitialCondition(Vector3 wInit, std::shared_ptr<Mesh> mesh)
 {
     std::vector<Vector3> w;
 
@@ -49,9 +43,8 @@ std::vector<Vector3> Solver::calcInitialCondition(Vector3 wInit)
     return w;
 }
 
-std::vector<Vector3> Solver::calcRiemannInitialCondition(Vector3 wl, Vector3 wr)
+std::vector<Vector3> Solver::calcInitialCondition(Vector3 wl, Vector3 wr, std::shared_ptr<Mesh> mesh)
 {
-    //TODO
     std::vector<Vector3> out;
 
     double firstX = mesh->getFirstX();
@@ -110,9 +103,8 @@ double Solver::timeStep(std::vector<Vector3> w, double dx, double cfl, double ti
 }
 
 
-std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const int& maxIter, const double& targetTime, const double& cfl)
+std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const double& dx, const int& maxIter, const double& targetTime, const double& cfl)
 {
-    double dx = mesh->getDx();
     double t = 0;
     std::vector<Vector3> wn;
 

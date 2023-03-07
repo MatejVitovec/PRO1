@@ -66,7 +66,7 @@ int main(int argc, char** argv)
     std::shared_ptr<Nozzle> mesh = std::make_shared<Nozzle>();
 
     std::shared_ptr<EulerEquations> eulerEqn = std::make_shared<EulerEquations>(1.4, 287.05);
-    std::shared_ptr<RiemannSolver> riemannSolver = std::make_shared<Hll>(eulerEqn);
+    std::shared_ptr<RiemannSolver> riemannSolver = std::make_shared<Hllc>(eulerEqn);
 
     //FVM schemes
     std::shared_ptr<SlopeLimiter> limiter = std::make_shared<Minmod>();
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
     mesh->setOutlet(std::make_shared<PressureOutlet>(80000.0, eulerEqn));
     
 
-    Solver mySolver = Solver(eulerEqn, mesh, spcScheme, tmpScheme);
+    Solver mySolver = Solver(eulerEqn, spcScheme, tmpScheme);
 
     //initial condition    
     //Vector3 init = eulerEqn->tempVeloPressToConservative(Vector3({293.15, 0.0, 100000.0}));
@@ -89,12 +89,12 @@ int main(int argc, char** argv)
     std::vector<Vector3> w;
 
     //solver init
-    w = mySolver.calcInitialCondition(init);
+    w = mySolver.calcInitialCondition(init, mesh);
 
     //cfl 0.8
-    std::vector<Vector3> wn = mySolver.solve(w, mesh, 20000, 0.8, "residueMinmod.txt");
+    std::vector<Vector3> wn = mySolver.solve(w, mesh, 20000, 0.8, "residueMinmodHllc.txt");
 
-    saveNozzle("nozzleMinmod.txt", wn, eulerEqn, mesh, 20000);
+    saveNozzle("nozzleMinmodHllc.txt", wn, eulerEqn, mesh, 20000);
 
     return 0;
 }

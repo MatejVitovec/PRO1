@@ -3,8 +3,8 @@ from matplotlib import pyplot as plt
 
 inputFileName = "PostProcess/residueNew.txt"
 inputFileName2 = "PostProcess/residueMinmod.txt"
+inputFileName3 = "PostProcess/residueMinmodHllc.txt"
 
-inputFileName3 = "PostProcess/residueNew.txt"
 inputFileName4 = "PostProcess/residueNew.txt"
 inputFileName5 = "PostProcess/residueNew.txt"
 
@@ -78,7 +78,7 @@ plt.figure(figsize=(8,6))
 
 plt.plot(range(0, len(res)*step, step), res, "r-", label="New")
 plt.plot(range(0, len(res2)*step2, step2), res2, "g-", label="HllMinmod")
-#plt.plot(range(0, len(res3)*step3, step3), res3, "b-", label="Hll")
+plt.plot(range(0, len(res3)*step3, step3), res3, "b-", label="HllcMinmod")
 #plt.plot(range(0, len(res4)*step4, step4), res4, "k-", label="Minmod")
 #plt.plot(range(0, len(res5)*step5, step5), res5, "y-", label="MinmodHll")
 plt.yscale("log")

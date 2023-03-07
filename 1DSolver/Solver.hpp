@@ -16,24 +16,22 @@ class Solver
 {
     public:
         Solver();
-        Solver(std::shared_ptr<EulerEquations> euler, std::shared_ptr<Mesh> mesh, std::shared_ptr<SpatialScheme> spcScheme, std::shared_ptr<TemporalScheme> tmpScheme);
+        Solver(std::shared_ptr<EulerEquations> euler, std::shared_ptr<SpatialScheme> spcScheme, std::shared_ptr<TemporalScheme> tmpScheme);
 
         
         void setEquationModel(std::shared_ptr<EulerEquations> euler);
-        void setMesh(std::shared_ptr<Mesh> mesh);
         void setSpatialScheme(std::shared_ptr<SpatialScheme> spcScheme);
         void setTemporalScheme(std::shared_ptr<TemporalScheme> tmpScheme);
 
-        std::vector<Vector3> calcInitialCondition(Vector3 wInit);
-        std::vector<Vector3> calcRiemannInitialCondition(Vector3 wl, Vector3 wr);
+        std::vector<Vector3> calcInitialCondition(Vector3 wInit, std::shared_ptr<Mesh> mesh);
+        std::vector<Vector3> calcInitialCondition(Vector3 wl, Vector3 wr, std::shared_ptr<Mesh> mesh);
 
-        std::vector<Vector3> solve(std::vector<Vector3> w, const int& iter, const double& targetTime, const double& cfl);
+        std::vector<Vector3> solve(std::vector<Vector3> w, const double& dx, const int& iter, const double& targetTime, const double& cfl);
         std::vector<Vector3> solve(std::vector<Vector3> w, std::shared_ptr<Nozzle> mesh, const int& iter, const double& cfl, const std::string& residueFile);
 
 
     protected:
         std::shared_ptr<EulerEquations> eulerEqn;
-        std::shared_ptr<Mesh> mesh;
         std::shared_ptr<SpatialScheme> spaceScheme;
         std::shared_ptr<TemporalScheme> temporalScheme;
 
