@@ -11,6 +11,9 @@ Solver::Solver()
 
 Solver::Solver(std::shared_ptr<EulerEquations> euler, std::shared_ptr<SpatialScheme> spcScheme, std::shared_ptr<TemporalScheme> tmpScheme)
 {
+    spcScheme->setEquationModel(euler);
+    tmpScheme->setSpatialScheme(spcScheme);
+
     setEquationModel(euler);
     setSpatialScheme(spcScheme);
     setTemporalScheme(tmpScheme);
@@ -29,6 +32,11 @@ void Solver::setSpatialScheme(std::shared_ptr<SpatialScheme> spcScheme)
 void Solver::setTemporalScheme(std::shared_ptr<TemporalScheme> tmpScheme)
 {
     Solver::temporalScheme = tmpScheme;
+}
+
+std::vector<double> Solver::getDensityResidues()
+{
+    return densityResidue;
 }
 
 std::vector<Vector3> Solver::calcInitialCondition(Vector3 wInit, std::shared_ptr<Mesh> mesh)
@@ -131,10 +139,10 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, const double& dx, con
 }
 
 
-std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<Nozzle> mesh, const int& iter, const double& cfl, const std::string& residueFile)
+std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<Nozzle> mesh, const int& iter, const double& cfl)
 {
     double dx = mesh->getDx();
-    std::vector<double> denRes;
+    densityResidue.clear();
 
     for (int i = 0; i < iter; i++)
     {
@@ -142,12 +150,10 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<Nozzl
 
         std::vector<Vector3> wn = temporalScheme->solve(w, dt, mesh);
 
-        denRes.push_back(calcDensityResidue(w, wn, dt));
+        densityResidue.push_back(calcDensityResidue(w, wn, dt));
 
         w = wn; //streaming
     }
-
-    saveDensityResidue(1, denRes, residueFile);
     
     std::cout << "vypocet probehl uspesne s " << iter << " iteracemi\n";
 
@@ -168,17 +174,3 @@ double Solver::calcDensityResidue(std::vector<Vector3> w, std::vector<Vector3> w
     //return sqrt(sumRes/n);
 }
 
-
-void Solver::saveDensityResidue(int step, std::vector<double> res, std::string fileName)
-{
-    std::ofstream of(fileName);
-
-    of << step << std::endl;
-
-    for (int i = 0; i < res.size(); i++)
-    {
-        of << res[i] << std::endl;
-    }
-
-    of.close();
-}

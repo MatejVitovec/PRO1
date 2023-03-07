@@ -8,6 +8,7 @@ class PressureTemperatureInlet : public BoundaryCondition
 {
     public:
         PressureTemperatureInlet();
+        PressureTemperatureInlet(double totPress, double totTemp);
         PressureTemperatureInlet(double totPress, double totTemp, std::shared_ptr<EulerEquations> euler);
 
         void setTotalPressure(double totPress);

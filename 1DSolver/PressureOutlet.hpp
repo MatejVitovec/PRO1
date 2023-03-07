@@ -8,6 +8,7 @@ class PressureOutlet : public BoundaryCondition
 {
     public:
         PressureOutlet();
+        PressureOutlet(double press);
         PressureOutlet(double press, std::shared_ptr<EulerEquations> euler);
 
         void setPressure(double press);

@@ -7,10 +7,16 @@ Muscl::Muscl()
 
 }
 
-Muscl::Muscl( std::shared_ptr<RiemannSolver> riemann, std::shared_ptr<SlopeLimiter> limiter, std::shared_ptr<EulerEquations> equationModel)
+Muscl::Muscl(std::shared_ptr<RiemannSolver> riemann, std::shared_ptr<SlopeLimiter> limiter)
 {
     setRiemannSolver(riemann);
     setLimiter(limiter);
+}
+
+Muscl::Muscl(std::shared_ptr<RiemannSolver> riemann, std::shared_ptr<SlopeLimiter> limiter, std::shared_ptr<EulerEquations> equationModel)
+{    
+    setLimiter(limiter);
+    setRiemannSolver(riemann);
     setEquationModel(equationModel);
 }
 
@@ -22,6 +28,12 @@ void Muscl::setRiemannSolver(std::shared_ptr<RiemannSolver> riemann)
 void Muscl::setLimiter(std::shared_ptr<SlopeLimiter> limiter)
 {
     Muscl::limiter = limiter;
+}
+
+void Muscl::setEquationModel(std::shared_ptr<EulerEquations> euler)
+{
+    eulerEqn = euler;    
+    Muscl::riemannSolver->setEquationModel(eulerEqn);
 }
 
 
@@ -136,7 +148,9 @@ std::vector<Vector3> Muscl::calculateResidues(const std::vector<Vector3>& w, std
 
     std::shared_ptr<BoundaryCondition> inlet = nozzle->getInlet();
     std::shared_ptr<BoundaryCondition> outlet = nozzle->getOutlet();
-
+    inlet->setEquationModel(eulerEqn);
+    outlet->setEquationModel(eulerEqn);
+    
     std::vector<Vector3> res;
 
     std::vector<Vector3> slopes = calcLimitedSlopes(w);

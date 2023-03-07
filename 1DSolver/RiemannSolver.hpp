@@ -9,8 +9,9 @@
 class RiemannSolver
 {
     public:
+        void setEquationModel(std::shared_ptr<EulerEquations> eulerEqnIn);
         virtual Vector3 calculateFlux(const Vector3& wl, const Vector3& wr) const = 0;
-        virtual std::vector<Vector3> calculateFluxes(const std::vector<Vector3>& wl, const std::vector<Vector3>& wr) const = 0;
+        std::vector<Vector3> calculateFluxes(const std::vector<Vector3>& wl, const std::vector<Vector3>& wr) const;
 
     protected:
         std::shared_ptr<EulerEquations> eulerEqn;

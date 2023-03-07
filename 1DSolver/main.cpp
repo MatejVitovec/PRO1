@@ -61,23 +61,37 @@ void saveNozzle(std::string fileName, std::vector<Vector3> w, std::shared_ptr<Eu
     writeToFile.close();
 }
 
+void saveDensityResidue(int step, std::vector<double> res, std::string fileName)
+{
+    std::ofstream of(fileName);
+
+    of << step << std::endl;
+
+    for (int i = 0; i < res.size(); i++)
+    {
+        of << res[i] << std::endl;
+    }
+
+    of.close();
+}
+
 int main(int argc, char** argv)
 {
     std::shared_ptr<Nozzle> mesh = std::make_shared<Nozzle>();
 
     std::shared_ptr<EulerEquations> eulerEqn = std::make_shared<EulerEquations>(1.4, 287.05);
-    std::shared_ptr<RiemannSolver> riemannSolver = std::make_shared<Hllc>(eulerEqn);
+    std::shared_ptr<RiemannSolver> riemannSolver = std::make_shared<Hllc>();
 
     //FVM schemes
     std::shared_ptr<SlopeLimiter> limiter = std::make_shared<Minmod>();
-    std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Muscl>(riemannSolver, limiter, eulerEqn);
-    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitHeun>(spcScheme);
-    /*std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Godunov>(riemannSolver, eulerEqn);
-    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitEuler>(spcScheme);*/
+    std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Muscl>(riemannSolver, limiter);
+    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitHeun>();
+    /*std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Godunov>(riemannSolver);
+    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitEuler>();*/
 
     //boundary condition
-    mesh->setInlet(std::make_shared<PressureDensityInlet>(100000.0, 1.2, eulerEqn));
-    mesh->setOutlet(std::make_shared<PressureOutlet>(80000.0, eulerEqn));
+    mesh->setInlet(std::make_shared<PressureDensityInlet>(100000.0, 1.2));
+    mesh->setOutlet(std::make_shared<PressureOutlet>(80000.0));
     
 
     Solver mySolver = Solver(eulerEqn, spcScheme, tmpScheme);
@@ -92,9 +106,10 @@ int main(int argc, char** argv)
     w = mySolver.calcInitialCondition(init, mesh);
 
     //cfl 0.8
-    std::vector<Vector3> wn = mySolver.solve(w, mesh, 20000, 0.8, "residueMinmodHllc.txt");
+    std::vector<Vector3> wn = mySolver.solve(w, mesh, 20000, 0.8);
 
     saveNozzle("nozzleMinmodHllc.txt", wn, eulerEqn, mesh, 20000);
+    saveDensityResidue(20000, mySolver.getDensityResidues(), "residueMinmodHllc.txt");
 
     return 0;
 }

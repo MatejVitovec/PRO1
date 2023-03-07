@@ -13,7 +13,7 @@ class SpatialScheme
         virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3>& w, double dx) const = 0;
         virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3>& w, std::shared_ptr<Nozzle> nozzle) const = 0;
 
-        void setEquationModel(std::shared_ptr<EulerEquations> euler);
+        virtual void setEquationModel(std::shared_ptr<EulerEquations> euler);
 
     protected:
         std::shared_ptr<EulerEquations> eulerEqn;

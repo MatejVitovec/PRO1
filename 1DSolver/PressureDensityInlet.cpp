@@ -7,6 +7,12 @@ PressureDensityInlet::PressureDensityInlet()
 
 }
 
+PressureDensityInlet::PressureDensityInlet(double totPress, double totRho)
+{
+    setTotalPressure(totPress);
+    setTotalDensity(totRho);
+}
+
 PressureDensityInlet::PressureDensityInlet(double totPress, double totRho, std::shared_ptr<EulerEquations> euler)
 {
     setTotalPressure(totPress);

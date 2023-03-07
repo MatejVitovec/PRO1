@@ -16,6 +16,7 @@ class Muscl : public SpatialScheme
         
         void setRiemannSolver(std::shared_ptr<RiemannSolver> riemann);
         void setLimiter(std::shared_ptr<SlopeLimiter> limiter);
+        virtual void setEquationModel(std::shared_ptr<EulerEquations> euler);
 
         virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3>& w, double dx) const;
         virtual std::vector<Vector3> calculateResidues(const std::vector<Vector3>& w, std::shared_ptr<Nozzle> nozzle) const;

@@ -8,6 +8,7 @@ class PressureDensityInlet : public BoundaryCondition
 {
     public:
         PressureDensityInlet();
+        PressureDensityInlet(double totPress, double totRho);
         PressureDensityInlet(double totPress, double totRho, std::shared_ptr<EulerEquations> euler);
 
         void setTotalPressure(double totPress);

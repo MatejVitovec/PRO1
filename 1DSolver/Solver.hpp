@@ -17,17 +17,17 @@ class Solver
     public:
         Solver();
         Solver(std::shared_ptr<EulerEquations> euler, std::shared_ptr<SpatialScheme> spcScheme, std::shared_ptr<TemporalScheme> tmpScheme);
-
         
         void setEquationModel(std::shared_ptr<EulerEquations> euler);
         void setSpatialScheme(std::shared_ptr<SpatialScheme> spcScheme);
         void setTemporalScheme(std::shared_ptr<TemporalScheme> tmpScheme);
+        std::vector<double> getDensityResidues();
 
         std::vector<Vector3> calcInitialCondition(Vector3 wInit, std::shared_ptr<Mesh> mesh);
         std::vector<Vector3> calcInitialCondition(Vector3 wl, Vector3 wr, std::shared_ptr<Mesh> mesh);
 
         std::vector<Vector3> solve(std::vector<Vector3> w, const double& dx, const int& iter, const double& targetTime, const double& cfl);
-        std::vector<Vector3> solve(std::vector<Vector3> w, std::shared_ptr<Nozzle> mesh, const int& iter, const double& cfl, const std::string& residueFile);
+        std::vector<Vector3> solve(std::vector<Vector3> w, std::shared_ptr<Nozzle> mesh, const int& iter, const double& cfl);
 
 
     protected:
@@ -39,7 +39,8 @@ class Solver
         double timeStep(std::vector<Vector3> w, double dx, double cfl, double time, double targetTime) const;
 
         double calcDensityResidue(std::vector<Vector3> w, std::vector<Vector3> wn, double dt);
-        void saveDensityResidue(int step, std::vector<double> res, std::string fileName);
+
+        std::vector<double> densityResidue;
 
 };
 

@@ -8,15 +8,26 @@ Godunov::Godunov()
 
 }
 
+Godunov::Godunov(std::shared_ptr<RiemannSolver> riemann)
+{
+    setRiemannSolver(riemann);
+}
+
 Godunov::Godunov(std::shared_ptr<RiemannSolver> riemann, std::shared_ptr<EulerEquations> equationModel)
 {
     setRiemannSolver(riemann);
-    setEquationModel(equationModel);
+    setEquationModel(equationModel);    
 }
 
 void Godunov::setRiemannSolver(std::shared_ptr<RiemannSolver> riemann)
 {
     riemannSolver = riemann;
+}
+
+void Godunov::setEquationModel(std::shared_ptr<EulerEquations> euler)
+{
+    eulerEqn = euler;
+    Godunov::riemannSolver->setEquationModel(eulerEqn);
 }
 
 

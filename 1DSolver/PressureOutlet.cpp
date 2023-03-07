@@ -8,6 +8,11 @@ PressureOutlet::PressureOutlet()
 
 }
 
+PressureOutlet::PressureOutlet(double press)
+{
+    setPressure(press);
+}
+
 PressureOutlet::PressureOutlet(double press, std::shared_ptr<EulerEquations> euler)
 {
     setPressure(press);

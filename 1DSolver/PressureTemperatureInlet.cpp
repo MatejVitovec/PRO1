@@ -7,6 +7,13 @@ PressureTemperatureInlet::PressureTemperatureInlet()
 
 }
 
+PressureTemperatureInlet::PressureTemperatureInlet(double totPress, double totTemp)
+{
+    setTotalPressure(totPress);
+    setTotalTemperature(totTemp);
+}
+
+
 PressureTemperatureInlet::PressureTemperatureInlet(double totPress, double totTemp, std::shared_ptr<EulerEquations> euler)
 {
     setTotalPressure(totPress);
