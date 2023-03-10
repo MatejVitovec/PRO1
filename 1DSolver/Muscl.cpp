@@ -161,6 +161,14 @@ std::vector<Vector3> Muscl::calculateResidues(const std::vector<Vector3>& w, std
     f.insert(f.begin(), riemannSolver->calculateFlux(inlet->calcBoundaryState(w), w[0]));
     f.push_back(riemannSolver->calculateFlux(w[w.size()-1], outlet->calcBoundaryState(w)));
 
+    /*std::vector<Vector3> wPom = w;
+    wPom[0] = w[0] - 1.0*slopes[0];
+    wPom[wPom.size()-1] = w[wPom.size()-1] + 1.0*slopes[wPom.size()-1];
+
+    std::vector<Vector3> f = riemannSolver->calculateFluxes(wl, wr);
+    f.insert(f.begin(), riemannSolver->calculateFlux(inlet->calcBoundaryState(wPom), w[0]));
+    f.push_back(riemannSolver->calculateFlux(w[w.size()-1], outlet->calcBoundaryState(wPom)));*/
+
     for (int i = 0; i < w.size(); i++)
     {
         res.push_back(((areaFaces[i]*f[i] - areaFaces[i+1]*f[i+1])/dx + Vector3({0.0, (eulerEqn->pressure(w[i]))*areaDiff[i], 0.0}))/area[i]);

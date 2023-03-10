@@ -11,6 +11,7 @@ class Nozzle : public Mesh
 {
     public:
         Nozzle();
+        Nozzle(int n);
         Nozzle(std::string fileName);
 
         void setInlet(std::shared_ptr<BoundaryCondition> in);
@@ -23,7 +24,7 @@ class Nozzle : public Mesh
         void calcAreaFaces();
 
         double areaFunction(double x);
-        void createGeometry();
+        void createGeometry(int cellsIn);
 
         void calcAreaDiff();
 

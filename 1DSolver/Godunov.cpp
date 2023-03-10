@@ -21,7 +21,7 @@ Godunov::Godunov(std::shared_ptr<RiemannSolver> riemann, std::shared_ptr<EulerEq
 
 void Godunov::setRiemannSolver(std::shared_ptr<RiemannSolver> riemann)
 {
-    riemannSolver = riemann;
+    Godunov::riemannSolver = riemann;
 }
 
 void Godunov::setEquationModel(std::shared_ptr<EulerEquations> euler)
@@ -57,6 +57,8 @@ std::vector<Vector3> Godunov::calculateResidues(const std::vector<Vector3>& w, s
 
     std::shared_ptr<BoundaryCondition> inlet = nozzle->getInlet();
     std::shared_ptr<BoundaryCondition> outlet = nozzle->getOutlet();
+    inlet->setEquationModel(eulerEqn);
+    outlet->setEquationModel(eulerEqn);
 
     std::vector<Vector3> res;
 

@@ -5,7 +5,12 @@
 
 Nozzle::Nozzle()
 {
-    createGeometry();
+
+}
+
+Nozzle::Nozzle(int n)
+{
+    createGeometry(n);
     calcAreaDiff();
 }
 
@@ -83,12 +88,12 @@ double Nozzle::areaFunction(double x)
     return 1.0 + (x - 0.5)*(x - 0.5);
 }
 
-void Nozzle::createGeometry()
+void Nozzle::createGeometry(int cellsIn)
 {
     area.clear();
     areaFaces.clear();
       
-    cells = 50;
+    cells = cellsIn;
     dx = 1.0/cells;
     firstFaceX = 0.0;
 

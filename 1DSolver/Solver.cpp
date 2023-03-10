@@ -1,8 +1,6 @@
 #include <cmath>
 #include <iostream>
 #include "Solver.hpp"
-#include <iostream>
-#include <fstream>
 
 Solver::Solver()
 {
@@ -147,6 +145,11 @@ std::vector<Vector3> Solver::solve(std::vector<Vector3> w, std::shared_ptr<Nozzl
     for (int i = 0; i < iter; i++)
     {
         double dt = timeStep(w, dx, cfl);
+
+        if(i == 15000)
+        {
+            int a = 5;
+        }
 
         std::vector<Vector3> wn = temporalScheme->solve(w, dt, mesh);
 

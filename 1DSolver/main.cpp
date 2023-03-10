@@ -61,7 +61,7 @@ void saveNozzle(std::string fileName, std::vector<Vector3> w, std::shared_ptr<Eu
     writeToFile.close();
 }
 
-void saveDensityResidue(int step, std::vector<double> res, std::string fileName)
+void saveDensityResidue(std::string fileName, std::vector<double> res, int step)
 {
     std::ofstream of(fileName);
 
@@ -77,7 +77,7 @@ void saveDensityResidue(int step, std::vector<double> res, std::string fileName)
 
 int main(int argc, char** argv)
 {
-    std::shared_ptr<Nozzle> mesh = std::make_shared<Nozzle>();
+    std::shared_ptr<Nozzle> mesh = std::make_shared<Nozzle>(200);
 
     std::shared_ptr<EulerEquations> eulerEqn = std::make_shared<EulerEquations>(1.4, 287.05);
     std::shared_ptr<RiemannSolver> riemannSolver = std::make_shared<Hllc>();
@@ -92,7 +92,6 @@ int main(int argc, char** argv)
     //boundary condition
     mesh->setInlet(std::make_shared<PressureDensityInlet>(100000.0, 1.2));
     mesh->setOutlet(std::make_shared<PressureOutlet>(80000.0));
-    
 
     Solver mySolver = Solver(eulerEqn, spcScheme, tmpScheme);
 
@@ -108,8 +107,8 @@ int main(int argc, char** argv)
     //cfl 0.8
     std::vector<Vector3> wn = mySolver.solve(w, mesh, 20000, 0.8);
 
-    saveNozzle("nozzleMinmodHllc.txt", wn, eulerEqn, mesh, 20000);
-    saveDensityResidue(20000, mySolver.getDensityResidues(), "residueMinmodHllc.txt");
+    saveNozzle("nozzle50MinmodHllc2.txt", wn, eulerEqn, mesh, 80000);
+    saveDensityResidue("residue50MinmodHllc2.txt", mySolver.getDensityResidues(), 80000);
 
     return 0;
 }

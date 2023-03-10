@@ -1,20 +1,31 @@
 import sys
 from matplotlib import pyplot as plt
 
-#sys.argv = "", "PostProcess/nozzle.txt", "r.-", "PostProcess/nozzleMinmod.txt", "g.-", "PostProcess/nozzleVanAlbada.txt", "b.-", "PostProcess/nozzleSuperbee.txt", "k.-", "PostProcess/nozzleMC.txt", "y.-", "PostProcess/nozzle.png"
-#sys.argv = "", "PostProcess/nozzle.txt", "r-", "PostProcess/nozzle50.txt", "g-", "PostProcess/nozzleHll.txt", "b-", "PostProcess/nozzleMinmod.txt", "k-", "PostProcess/nozzleMinmodHll.txt", "y-", "PostProcess/nozzle.png"
-sys.argv = "", "PostProcess/nozzleNew.txt", "r-", "PostProcess/nozzleMinmod.txt", "g-", "PostProcess/nozzleMinmodHllc.txt", "b-", "PostProcess/nozzle.png"
+#sys.argv = "", "PostProcess/nozzle50GodunovHll.txt", "r.-", "PostProcess/nozzle50MinmodHll.txt", "gx-", "PostProcess/nozzle50VanAlbadaHll.txt", "b.-", "PostProcess/nozzle50SuperbeeHll.txt", "k.-", "PostProcess/nozzle50MCHll.txt", "y.-", "PostProcess/nozzle50Hll.png"
+#sys.argv = "", "PostProcess/nozzle50GodunovHll.txt", "r.-", "PostProcess/nozzle200GodunovHll.txt", "g.-", "PostProcess/nozzle500GodunovHll.txt", "b.-", "PostProcess/nozzle500Hll.png"
+sys.argv = "", "PostProcess/nozzle50MinmodHll.txt", "r.-", "PostProcess/nozzle50MinmodHllc.txt", "g.-", "PostProcess/nozzle50MinmodHllc2.txt", "b.-", "PostProcess/nozzle50MinmodHllc2.png"
 
 
 def plotMultipleCurves(x, y, plotType):
     for i in range(len(x)):
         plt.plot(x[i], y[i], plotType[i], linewidth=0.7, markersize=2.0)
 
+def plotMultipleCurvesl(x, y, plotType, labels):
+    for i in range(len(x)):
+        plt.plot(x[i], y[i], plotType[i], linewidth=0.7, markersize=2.0, label = labels[i])
+
 
 inputFileNum = 1
 
 if len(sys.argv) > 1:
     inputFileNum = (int)(len(sys.argv)/2 - 1)
+
+labels =  [0] * inputFileNum
+labels[0] = "HLL"
+labels[1] = "HLLC"
+labels[2] = "HLLC2"
+#labels[3] = "HLLC Minmod"
+#labels[4] = "MC"
 
 inputFileName = [0] * inputFileNum
 plotType = [0] * inputFileNum
@@ -79,31 +90,35 @@ outputFileName = sys.argv[inputFileNum*2 + 1]
 plt.figure(figsize=(8,6))
 
 plt.subplot(2,2,1)
-plotMultipleCurves(x, d, plotType)
+plotMultipleCurvesl(x, d, plotType, labels)
 plt.xlabel("Position")
 plt.ylabel("Density")
+plt.legend()
+#plt.xlim([0.6,0.8])
 plt.grid()
 
 plt.subplot(2,2,2)
 plotMultipleCurves(x, u, plotType)
 plt.xlabel("Position")
 plt.ylabel("Velocity")
+#plt.xlim([0.6,0.8])
 plt.grid()
 
 plt.subplot(2,2,3)
 plotMultipleCurves(x, p, plotType)
 plt.xlabel("Position")
 plt.ylabel("Pressure")
+#plt.xlim([0.6,0.8])
 plt.grid()
 
 plt.subplot(2,2,4)
 plotMultipleCurves(x, ma, plotType)
 plt.xlabel("Position")
 plt.ylabel("Mach number")
+#plt.xlim([0.6,0.8])
 plt.grid()
 
 plt.suptitle("iter = " + str(time[0]) + ", cells = " + str(cells[0]))
-
 
 
 plt.tight_layout()
