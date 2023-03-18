@@ -20,7 +20,7 @@ void Hllc::setEquationModel(std::shared_ptr<EulerEquations> eqnIn)
 Vector3 Hllc::waveSpeedsEstimate(const Vector3& wl, const Vector3& wr) const
 {
     //PVRS
-    double pl = eulerEqn->pressure(wl);
+    /*double pl = eulerEqn->pressure(wl);
     double pr = eulerEqn->pressure(wr);
     double ul = eulerEqn->velocity(wl);
     double ur = eulerEqn->velocity(wr);
@@ -56,7 +56,22 @@ Vector3 Hllc::waveSpeedsEstimate(const Vector3& wl, const Vector3& wr) const
 
     double ss = (pr - pl + rhol*ul*(sl - ul) - rhor*ur*(sr - ur))/(rhol*sl - rhol*ul - rhor*sr + rhor*ur);
 
-    return Vector3({sl, ss, sr});
+    return Vector3({sl, ss, sr});*/
+
+    double ul = eulerEqn->velocity(wl);
+    double ur = eulerEqn->velocity(wr);
+    double al = eulerEqn->soundSpeed(wl);
+    double ar = eulerEqn->soundSpeed(wr);
+    double pl = eulerEqn->pressure(wl);
+    double pr = eulerEqn->pressure(wr);
+    double rhol = eulerEqn->density(wl);
+    double rhor = eulerEqn->density(wr);
+
+    double sl = std::min(ul - al, ur - ar);
+    double sr = std::max(ul + al, ur + ar);
+    double ss = (pr - pl + rhol*ul*(sl - ul) - rhor*ur*(sr - ur))/(rhol*sl - rhol*ul - rhor*sr + rhor*ur);
+
+    return Vector3({sl, ss, sr});    
     
 }
 

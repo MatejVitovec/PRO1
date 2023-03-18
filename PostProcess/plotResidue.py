@@ -8,6 +8,9 @@ inputFileName4 = "PostProcess/residue50MCHll.txt"
 inputFileName5 = "PostProcess/residue50MCHll.txt"
 outputFileName = "PostProcess/residue50MinmodHllc2.png"
 
+inputFileName = "PostProcess/residuePokusHll.txt"
+inputFileName2 = "PostProcess/residuePokusHllc.txt"
+outputFileName = "PostProcess/residuePokus.png"
 
 f = open(inputFileName, "r")
 res = []
@@ -70,7 +73,7 @@ plt.figure(figsize=(8,6))
 
 plt.plot(range(0, step), res, "r-", label="HLL")
 plt.plot(range(0, step2), res2, "g-", label="HLLC")
-plt.plot(range(0, step3), res3, "b-", label="HLLC2")
+#plt.plot(range(0, step3), res3, "b-", label="HLLC2")
 #plt.plot(range(0, step4), res4, "k-", label="HLLC Minmod")
 #plt.plot(range(0, step5), res5, "y-", label="MC")
 

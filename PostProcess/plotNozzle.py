@@ -3,7 +3,8 @@ from matplotlib import pyplot as plt
 
 #sys.argv = "", "PostProcess/nozzle50GodunovHll.txt", "r.-", "PostProcess/nozzle50MinmodHll.txt", "gx-", "PostProcess/nozzle50VanAlbadaHll.txt", "b.-", "PostProcess/nozzle50SuperbeeHll.txt", "k.-", "PostProcess/nozzle50MCHll.txt", "y.-", "PostProcess/nozzle50Hll.png"
 #sys.argv = "", "PostProcess/nozzle50GodunovHll.txt", "r.-", "PostProcess/nozzle200GodunovHll.txt", "g.-", "PostProcess/nozzle500GodunovHll.txt", "b.-", "PostProcess/nozzle500Hll.png"
-sys.argv = "", "PostProcess/nozzle50MinmodHll.txt", "r.-", "PostProcess/nozzle50MinmodHllc.txt", "g.-", "PostProcess/nozzle50MinmodHllc2.txt", "b.-", "PostProcess/nozzle50MinmodHllc2.png"
+#sys.argv = "", "PostProcess/nozzle50MinmodHll.txt", "r.-", "PostProcess/nozzle50MinmodHllc.txt", "g.-", "PostProcess/nozzle50MinmodHllc2.txt", "b.-", "PostProcess/nozzle50MinmodHllc2.png"
+sys.argv = "", "PostProcess/nozzlePokusHll.txt", "r.-", "PostProcess/nozzlePokusHllc.txt", "g.-", "PostProcess/nozzlePokus.png"
 
 
 def plotMultipleCurves(x, y, plotType):
@@ -23,7 +24,7 @@ if len(sys.argv) > 1:
 labels =  [0] * inputFileNum
 labels[0] = "HLL"
 labels[1] = "HLLC"
-labels[2] = "HLLC2"
+#labels[2] = "HLLC2"
 #labels[3] = "HLLC Minmod"
 #labels[4] = "MC"
 
