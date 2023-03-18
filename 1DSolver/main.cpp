@@ -86,7 +86,7 @@ int main(int argc, char** argv)
     std::shared_ptr<RiemannSolver> riemannSolver = std::make_shared<Hll>();
 
     //FVM schemes
-    /*std::shared_ptr<SlopeLimiter> limiter = std::make_shared<Minmod>();
+    /*std::shared_ptr<SlopeLimiter> limiter = std::make_shared<MonotonizedCentral>();
     std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Muscl>(riemannSolver, limiter);
     std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitHeun>();*/
     std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Godunov>(riemannSolver);
@@ -107,11 +107,13 @@ int main(int argc, char** argv)
     //solver init
     w = mySolver.calcInitialCondition(init, mesh);
 
-    //cfl 0.8
-    std::vector<Vector3> wn = mySolver.solve(w, mesh, 20000, 0.8);
+    int iter = 20000;
 
-    saveNozzle("../PostProcess/nozzle50GodunovHll.txt", wn, eulerEqn, mesh, 20000);
-    saveDensityResidue("../PostProcess/residue50GodunovHll.txt", mySolver.getDensityResidues(), 20000);
+    //cfl 0.8
+    std::vector<Vector3> wn = mySolver.solve(w, mesh, iter, 0.8);
+
+    saveNozzle("../PostProcess/nozzle50GodunovHll.txt", wn, eulerEqn, mesh, iter);
+    saveDensityResidue("../PostProcess/residue50GodunovHll.txt", mySolver.getDensityResidues(), iter);
 
     return 0;
 }

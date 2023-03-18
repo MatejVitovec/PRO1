@@ -1,10 +1,10 @@
 import sys
 from matplotlib import pyplot as plt
 
-#sys.argv = "", "PostProcess/nozzle50GodunovHll.txt", "r.-", "PostProcess/nozzle50MinmodHll.txt", "gx-", "PostProcess/nozzle50VanAlbadaHll.txt", "b.-", "PostProcess/nozzle50SuperbeeHll.txt", "k.-", "PostProcess/nozzle50MCHll.txt", "y.-", "PostProcess/nozzle50Hll.png"
-#sys.argv = "", "PostProcess/nozzle50GodunovHll.txt", "r.-", "PostProcess/nozzle200GodunovHll.txt", "g.-", "PostProcess/nozzle500GodunovHll.txt", "b.-", "PostProcess/nozzle500Hll.png"
-#sys.argv = "", "PostProcess/nozzle50MinmodHll.txt", "r.-", "PostProcess/nozzle50MinmodHllc.txt", "g.-", "PostProcess/nozzle50MinmodHllc2.txt", "b.-", "PostProcess/nozzle50MinmodHllc2.png"
-sys.argv = "", "PostProcess/nozzlePokusHll.txt", "r.-", "PostProcess/nozzlePokusHllc.txt", "g.-", "PostProcess/nozzlePokus.png"
+#sys.argv = "", "PostProcess/nozzle50GodunovHllc.txt", "r.-", "PostProcess/nozzle50MinmodHllc.txt", "gx-", "PostProcess/nozzle50VanAlbadaHllc.txt", "b.-", "PostProcess/nozzle50SuperbeeHllc.txt", "k.-", "PostProcess/nozzle50MCHllc.txt", "y.-", "PostProcess/nozzle50HllcDetail.png"
+sys.argv = "", "PostProcess/nozzle50GodunovHllc.txt", "r.-", "PostProcess/nozzle200GodunovHllc.txt", "g.-", "PostProcess/nozzle500GodunovHllc.txt", "b.-", "PostProcess/nozzle500Hllc.png"
+#sys.argv = "", "PostProcess/nozzle50GodunovHll.txt", "r.-", "PostProcess/nozzle50GodunovHllc.txt", "g.-", "PostProcess/nozzle50MinmodHll.txt", "b.-", "PostProcess/nozzle50MinmodHllc.txt", "k.-", "PostProcess/nozzle50HllHllc.png"
+
 
 
 def plotMultipleCurves(x, y, plotType):
@@ -22,10 +22,10 @@ if len(sys.argv) > 1:
     inputFileNum = (int)(len(sys.argv)/2 - 1)
 
 labels =  [0] * inputFileNum
-labels[0] = "HLL"
-labels[1] = "HLLC"
-#labels[2] = "HLLC2"
-#labels[3] = "HLLC Minmod"
+labels[0] = "n = 50"
+labels[1] = "n = 200"
+labels[2] = "n = 500"
+#labels[3] = "Minmod HLLC"
 #labels[4] = "MC"
 
 inputFileName = [0] * inputFileNum

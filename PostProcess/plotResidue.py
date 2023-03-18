@@ -1,16 +1,22 @@
 import sys
 from matplotlib import pyplot as plt
 
-inputFileName = "PostProcess/residue50MinmodHll.txt"
+inputFileName = "PostProcess/residue50GodunovHllc.txt"
 inputFileName2 = "PostProcess/residue50MinmodHllc.txt"
-inputFileName3 = "PostProcess/residue50MinmodHllc2.txt"
-inputFileName4 = "PostProcess/residue50MCHll.txt"
-inputFileName5 = "PostProcess/residue50MCHll.txt"
-outputFileName = "PostProcess/residue50MinmodHllc2.png"
+inputFileName3 = "PostProcess/residue50VanAlbadaHllc.txt"
+inputFileName4 = "PostProcess/residue50SuperbeeHllc.txt"
+inputFileName5 = "PostProcess/residue50MCHllc.txt"
 
-inputFileName = "PostProcess/residuePokusHll.txt"
-inputFileName2 = "PostProcess/residuePokusHllc.txt"
-outputFileName = "PostProcess/residuePokus.png"
+inputFileName = "PostProcess/residue50GodunovHll.txt"
+inputFileName2 = "PostProcess/residue50GodunovHllc.txt"
+inputFileName3 = "PostProcess/residue50MinmodHll.txt"
+inputFileName4 = "PostProcess/residue50MinmodHllc.txt"
+
+inputFileName = "PostProcess/residue50GodunovHllc.txt"
+inputFileName2 = "PostProcess/residue200GodunovHllc.txt"
+inputFileName3 = "PostProcess/residue500GodunovHllc.txt"
+outputFileName = "PostProcess/residue500Hllc.png"
+
 
 f = open(inputFileName, "r")
 res = []
@@ -71,10 +77,10 @@ f.close()
 
 plt.figure(figsize=(8,6))
 
-plt.plot(range(0, step), res, "r-", label="HLL")
-plt.plot(range(0, step2), res2, "g-", label="HLLC")
-#plt.plot(range(0, step3), res3, "b-", label="HLLC2")
-#plt.plot(range(0, step4), res4, "k-", label="HLLC Minmod")
+plt.plot(range(0, step), res, "r-", label="n = 50")
+plt.plot(range(0, step2), res2, "g-", label="n = 200")
+plt.plot(range(0, step3), res3, "b-", label="n = 500")
+#plt.plot(range(0, step4), res4, "k-", label="Minmod HLLC")
 #plt.plot(range(0, step5), res5, "y-", label="MC")
 
 plt.yscale("log")
