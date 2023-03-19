@@ -12,10 +12,10 @@ inputFileName2 = "PostProcess/residue50GodunovHllc.txt"
 inputFileName3 = "PostProcess/residue50MinmodHll.txt"
 inputFileName4 = "PostProcess/residue50MinmodHllc.txt"
 
-inputFileName = "PostProcess/residue50GodunovHllc.txt"
-inputFileName2 = "PostProcess/residue200GodunovHllc.txt"
-inputFileName3 = "PostProcess/residue500GodunovHllc.txt"
-outputFileName = "PostProcess/residue500Hllc.png"
+inputFileName = "PostProcess/residue50MinmodEulerHllc.txt"
+inputFileName2 = "PostProcess/residue50MinmodHllc.txt"
+inputFileName3 = "PostProcess/residue50MinmodCollatzHllc.txt"
+outputFileName = "PostProcess/residue50HllcTemp.png"
 
 
 f = open(inputFileName, "r")
@@ -77,9 +77,9 @@ f.close()
 
 plt.figure(figsize=(8,6))
 
-plt.plot(range(0, step), res, "r-", label="n = 50")
-plt.plot(range(0, step2), res2, "g-", label="n = 200")
-plt.plot(range(0, step3), res3, "b-", label="n = 500")
+plt.plot(range(0, step), res, "r-", label="Euler")
+plt.plot(range(0, step2), res2, "g-", label="Heun")
+plt.plot(range(0, step3), res3, "b-", label="Collatz")
 #plt.plot(range(0, step4), res4, "k-", label="Minmod HLLC")
 #plt.plot(range(0, step5), res5, "y-", label="MC")
 

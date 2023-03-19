@@ -83,14 +83,14 @@ int main(int argc, char** argv)
     std::shared_ptr<Nozzle> mesh = std::make_shared<Nozzle>(50);
 
     std::shared_ptr<EulerEquations> eulerEqn = std::make_shared<EulerEquations>(1.4, 287.05);
-    std::shared_ptr<RiemannSolver> riemannSolver = std::make_shared<Hll>();
+    std::shared_ptr<RiemannSolver> riemannSolver = std::make_shared<Hllc>();
 
     //FVM schemes
-    /*std::shared_ptr<SlopeLimiter> limiter = std::make_shared<MonotonizedCentral>();
+    std::shared_ptr<SlopeLimiter> limiter = std::make_shared<Minmod>();
     std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Muscl>(riemannSolver, limiter);
-    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitHeun>();*/
-    std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Godunov>(riemannSolver);
-    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitEuler>();
+    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitHeun>();
+    /*std::shared_ptr<SpatialScheme> spcScheme = std::make_shared<Godunov>(riemannSolver);
+    std::shared_ptr<TemporalScheme> tmpScheme = std::make_shared<ExplicitEuler>();*/
 
     //boundary condition
     mesh->setInlet(std::make_shared<nonLinearPressureDensityInlet>(100000.0, 1.2));
@@ -112,8 +112,8 @@ int main(int argc, char** argv)
     //cfl 0.8
     std::vector<Vector3> wn = mySolver.solve(w, mesh, iter, 0.8);
 
-    saveNozzle("../PostProcess/nozzle50GodunovHll.txt", wn, eulerEqn, mesh, iter);
-    saveDensityResidue("../PostProcess/residue50GodunovHll.txt", mySolver.getDensityResidues(), iter);
+    saveNozzle("../PostProcess/nozzle50GodunovHllc.txt", wn, eulerEqn, mesh, iter);
+    saveDensityResidue("../PostProcess/residue50GodunovHllc.txt", mySolver.getDensityResidues(), iter);
 
     return 0;
 }
